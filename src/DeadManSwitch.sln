@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch", "DeadManSwi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Tests", "DeadManSwitch.Tests\DeadManSwitch.Tests.csproj", "{4926E5B1-CE92-4037-A737-04EF5D6BC0C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Examples", "DeadManSwitch.Examples\DeadManSwitch.Examples.csproj", "{CC4538FE-3C94-488E-9A14-B8FC550A16F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{4926E5B1-CE92-4037-A737-04EF5D6BC0C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4926E5B1-CE92-4037-A737-04EF5D6BC0C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4926E5B1-CE92-4037-A737-04EF5D6BC0C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
