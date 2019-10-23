@@ -8,6 +8,27 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch
 {
+    public interface IDeadManSwitch : IDisposable
+    {
+        /// <summary>
+        /// The cancellation token that will be marked as canceled when the dead man's switch is triggered
+        /// </summary>
+        CancellationToken CancellationToken { get; }
+        
+        /// <summary>
+        /// Runs the dead man's switch. When no notifications are received within the proper timeout period, the <see cref="CancellationToken"/>
+        /// will be cancelled automatically. You should pass this cancellation token to any task that must be cancelled.
+        /// </summary>
+        /// <returns>A value indicating whether the dead man switch triggered or not</returns>
+        ValueTask<DeadManSwitchResult> RunAsync(CancellationToken deadManSwitchCancellationToken);
+
+        ValueTask NotifyAsync(string notification);
+        ValueTask PauseAsync();
+        ValueTask ResumeAsync();
+        
+        IEnumerable<DeadManSwitchNotification> Notifications { get; }
+    }
+    
     public sealed class DeadManSwitch : IDeadManSwitch
     {
         private readonly ILogger _logger;
@@ -42,7 +63,7 @@ namespace DeadManSwitch
 
         public async ValueTask NotifyAsync(string notification)
         {
-             _logger.LogTrace($"{nameof(DeadManSwitch)} notification: {notification}");
+             _logger.LogTrace("Received notification: {Notification}", notification);
             
             if (notification == null) throw new ArgumentNullException(nameof(notification));
 
@@ -125,10 +146,15 @@ namespace DeadManSwitch
             _statuses.Writer.Complete();
             _notifications.Writer.Complete();
 
-            var trace = string.Join(Environment.NewLine, Notifications.Select(n => n.ToString()));
-            _logger.LogWarning($"The worker task did not notify the dead man's switch within the agreed timeout of {_timeout.TotalSeconds}s " +
-                        $"and will be cancelled.{Environment.NewLine}" +
-                        $"Notification trace: {Environment.NewLine}{trace}");
+            
+            _logger.LogWarning("The worker task did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
+                        "and will be cancelled.", _timeout.TotalSeconds);
+            var notifications = Notifications.ToList();
+            _logger.LogWarning("These were the last {NotificationCount} notifications: ", notifications.Count);
+            foreach (var notification in notifications)
+            {
+                _logger.LogWarning("{NotificationTimestamp} {NotificationContent}", notification.Timestamp, notification.Content);
+            }
 
             _taskCancellationTokenSource.Cancel();
         }

@@ -30,7 +30,7 @@ namespace DeadManSwitch
             using(var deadManSwitch = _deadManSwitchFactory.Create(task.Timeout, cancellationToken))
             using(var deadManSwitchCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                _logger.LogTrace($"Running task {task.Name} using a dead man switch");
+                _logger.LogTrace("Running task {TaskName} using a dead man switch", task.Name);
 
                 var deadManSwitchTaskExecution = Task.Run(() => _deadManSwitchTaskExecutor.ExecuteAsync(task, deadManSwitch), cancellationToken);
                 var deadManSwitchTask = deadManSwitch.RunAsync(deadManSwitchCTS.Token);
@@ -42,27 +42,11 @@ namespace DeadManSwitch
                 var deadManSwitchTaskResult = await deadManSwitchTask.ConfigureAwait(false);
                 var result = new DeadManSwitchTaskOneTimeRunnerResult(deadManSwitchTaskExecutionResult, deadManSwitchTaskResult);
                 
-                _logger.LogTrace($"Task {task.Name} is finished: {result}");
+                _logger.LogTrace("Task {TaskName} is finished with result {TaskResult} and dead man switch result {DeadManSwitchResult}",
+                    task.Name, result.DeadManSwitchTaskExecutionResult, result.DeadManSwitchResult);
 
                 return result;
             }
-        }
-    }
-    
-    public class DeadManSwitchTaskOneTimeRunnerResult
-    {
-        public DeadManSwitchTaskExecutionResult DeadManSwitchTaskExecutionResult { get; }
-        public DeadManSwitchResult DeadManSwitchResult { get; }
-
-        public DeadManSwitchTaskOneTimeRunnerResult(DeadManSwitchTaskExecutionResult deadManSwitchTaskExecutionResult, DeadManSwitchResult deadManSwitchResult)
-        {
-            DeadManSwitchTaskExecutionResult = deadManSwitchTaskExecutionResult;
-            DeadManSwitchResult = deadManSwitchResult;
-        }
-
-        public override string ToString()
-        {
-            return $"Task: {DeadManSwitchTaskExecutionResult}, Switch: {DeadManSwitchResult}";
         }
     }
 }

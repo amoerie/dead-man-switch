@@ -26,7 +26,7 @@ namespace DeadManSwitch
         {
             var result = new DeadManSwitchTaskInfiniteRunnerResult();
 
-            _logger.LogTrace($"Running task {task.Name} infinitely using a dead man switch");
+            _logger.LogTrace("Running task {TaskName} infinitely using a dead man switch", task.Name);
             
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -44,48 +44,12 @@ namespace DeadManSwitch
                 }
             }
             
-            _logger.LogTrace($"Stopping infinite task {task.Name}, with the following results: {result}");
-
+            _logger.LogTrace("Infinite task {TaskName} has been cancelled, these are the results:", task.Name);
+            _logger.LogTrace("Tasks that finished gracefully: {TasksThatFinishedGracefully}", result.TasksThatFinishedGracefully);
+            _logger.LogTrace("Tasks that threw an exception : {TasksThatThrewAnException}", result.TasksThatThrewAnException);
+            _logger.LogTrace("Tasks that were canceled      : {TasksThatWereCanceled}", result.TasksThatWereCanceled);
+            _logger.LogTrace("Dead man switches triggered   : {DeadManSwitchesTriggered}", result.DeadManSwitchesTriggered);
             return result;
-        }
-    }
-
-    public class DeadManSwitchTaskInfiniteRunnerResult
-    {
-        public int TasksThatFinishedGracefully { get; set; }
-        public int TasksThatThrewAnException { get; set; }
-        public int TasksThatWereCanceled { get; set; }
-        public int DeadManSwitchesTriggered { get; set; }
-
-        public void Report(DeadManSwitchTaskExecutionResult executionResult, DeadManSwitchResult switchResult)
-        {
-            switch (executionResult)
-            {
-                case DeadManSwitchTaskExecutionResult.TaskFinishedGracefully:
-                    TasksThatFinishedGracefully++;
-                    break;
-                case DeadManSwitchTaskExecutionResult.TaskThrewAnException:
-                    TasksThatThrewAnException++;
-                    break;
-                case DeadManSwitchTaskExecutionResult.TaskWasCancelled:
-                    TasksThatWereCanceled++;
-                    break;
-            }
-
-            switch (switchResult)
-            {    
-                case DeadManSwitchResult.DeadManSwitchWasTriggered:
-                    DeadManSwitchesTriggered++;
-                    break;
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(TasksThatFinishedGracefully)}: {TasksThatFinishedGracefully}, " +
-                   $"{nameof(TasksThatThrewAnException)}: {TasksThatThrewAnException}, " +
-                   $"{nameof(TasksThatWereCanceled)}: {TasksThatWereCanceled}, " +
-                   $"{nameof(DeadManSwitchesTriggered)}: {DeadManSwitchesTriggered}";
         }
     }
 }

@@ -17,6 +17,11 @@ namespace DeadManSwitch.Examples
         
         public async Task ExecuteAsync(IDeadManSwitch deadManSwitch)
         {
+            if (deadManSwitch is null)
+            {
+                throw new ArgumentNullException(nameof(deadManSwitch));
+            }
+
             await deadManSwitch.NotifyAsync("Beginning work again").ConfigureAwait(false);
             
             await Task.Delay(TimeSpan.FromSeconds(1), deadManSwitch.CancellationToken).ConfigureAwait(false);

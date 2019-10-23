@@ -14,19 +14,22 @@ namespace DeadManSwitch.Examples
         
         public async Task ExecuteAsync(IDeadManSwitch deadManSwitch)
         {
+            if (deadManSwitch == null)
+                throw new ArgumentNullException(nameof(deadManSwitch));
+
             await deadManSwitch.NotifyAsync("Beginning work").ConfigureAwait(false);
-            
+
             await Task.Delay(TimeSpan.FromSeconds(1), deadManSwitch.CancellationToken).ConfigureAwait(false);
 
             await deadManSwitch.NotifyAsync("Still busy, please don't cancel").ConfigureAwait(false);
 
             await DoSomethingUseful(deadManSwitch.CancellationToken).ConfigureAwait(false);
-            
+
             // tell the dead man switch to stop the clock
             await deadManSwitch.PauseAsync().ConfigureAwait(false);
-            
+
             await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelled().ConfigureAwait(false);
-            
+
             // tell the dead man switch to resume the clock
             await deadManSwitch.ResumeAsync().ConfigureAwait(false);
         }

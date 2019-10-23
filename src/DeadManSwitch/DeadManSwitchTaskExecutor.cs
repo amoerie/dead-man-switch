@@ -24,12 +24,12 @@ namespace DeadManSwitch
             var cancellationToken = deadManSwitch.CancellationToken;
             try
             {
-                logger.LogDebug($"Starting task {task.Name }");
+                logger.LogDebug("Starting task {TaskName}", task.Name);
                 var execute = task.ExecuteAsync(deadManSwitch);
                 if (!deadManSwitch.CancellationToken.CanBeCanceled)
                 {
                     await execute.ConfigureAwait(false);
-                    logger.LogDebug($"Task {task.Name} finished gracefully");
+                    logger.LogDebug("Task {TaskName} finished gracefully", task.Name);
                     return DeadManSwitchTaskExecutionResult.TaskFinishedGracefully;
                 }
 
@@ -40,7 +40,7 @@ namespace DeadManSwitch
                 var cancellationTask = cancellationTaskCompletionSource.Task;
                 using (cancellationToken.Register(() => cancellationTaskCompletionSource.TrySetCanceled(cancellationToken), useSynchronizationContext: false))
                 {
-                    logger.LogTrace($"Waiting for task {task.Name} to finish or be canceled");
+                    logger.LogTrace("Waiting for task {TaskName} to finish or be canceled", task.Name);
                     var winner = await Task.WhenAny(execute, cancellationTask).ConfigureAwait(false);
                     await winner.ConfigureAwait(false);
                     return DeadManSwitchTaskExecutionResult.TaskFinishedGracefully;
@@ -48,12 +48,12 @@ namespace DeadManSwitch
             }
             catch (OperationCanceledException)
             {
-                logger.LogWarning($"Task {task.Name} was canceled");
+                logger.LogWarning("Task {TaskName} was canceled", task.Name);
                 return DeadManSwitchTaskExecutionResult.TaskWasCancelled;
             }
             catch (Exception exception)
             {
-                logger.LogError(exception, $"Task {task.Name} threw an exception");
+                logger.LogError(exception, "Task {TaskName} threw an exception", task.Name);
                 return DeadManSwitchTaskExecutionResult.TaskThrewAnException;
             }
         }

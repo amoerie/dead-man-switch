@@ -12,10 +12,5 @@ namespace DeadManSwitch
             Timestamp = DateTime.Now;
             Content = content ?? throw new ArgumentNullException(nameof(content));
         }
-
-        public override string ToString()
-        {
-            return $"{Timestamp:yyyy-MM-dd HH:mm:ss.fff}: {Content}";
-        }
     }
 }
