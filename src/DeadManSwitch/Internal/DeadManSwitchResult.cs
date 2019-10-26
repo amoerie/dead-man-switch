@@ -1,6 +1,6 @@
-﻿namespace DeadManSwitch
+﻿namespace DeadManSwitch.Internal
 {
-    public enum DeadManSwitchResult
+    internal enum DeadManSwitchResult
     {
         /// <summary>
         /// The dead man's switch was triggered and the work has been canceled

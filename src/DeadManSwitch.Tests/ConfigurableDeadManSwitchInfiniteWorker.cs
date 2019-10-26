@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace DeadManSwitch.Tests
 {
-    public class ConfigurableDeadManSwitchInfiniteTask : IDeadManSwitchInfiniteTask
+    public class ConfigurableDeadManSwitchInfiniteWorker : IDeadManSwitchInfiniteWorker
     {
         private List<Func<IDeadManSwitch, Task>> Actions { get; }
         private int _actionIndex = 0;
 
-        public ConfigurableDeadManSwitchInfiniteTask(TimeSpan timeout, TimeSpan delay, IEnumerable<Func<IDeadManSwitch, Task>> actions)
+        public ConfigurableDeadManSwitchInfiniteWorker(TimeSpan timeout, TimeSpan delay, IEnumerable<Func<IDeadManSwitch, Task>> actions)
         {
             Timeout = timeout;
             Delay = delay;

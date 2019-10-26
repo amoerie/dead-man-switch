@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using DeadManSwitch.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Examples
@@ -16,10 +17,10 @@ namespace DeadManSwitch.Examples
             var logger = loggerFactory.CreateLogger<ExampleOneTimeTaskProgram>();
             var runner = new DeadManSwitchTaskOneTimeRunner(
                 logger,
-                new DeadManSwitchFactory(logger, 10),
-                new DeadManSwitchTaskExecutor(logger)
+                new DeadManSwitchSessionFactory(logger, 10),
+                new DeadManSwitchWorkerScheduler(logger)
             );
-            var task = new ExampleOneTimeTask();
+            var task = new ExampleOneTime();
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {

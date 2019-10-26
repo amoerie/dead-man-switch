@@ -1,4 +1,6 @@
-﻿namespace DeadManSwitch
+﻿using DeadManSwitch.Internal;
+
+namespace DeadManSwitch
 {
     public class DeadManSwitchTaskOneTimeRunnerResult
     {
