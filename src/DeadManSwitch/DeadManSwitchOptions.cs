@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch
 {
-    public class DeadManSwitchOptions
+    public sealed class DeadManSwitchOptions
     {
         /// <summary>
         /// The logger to which diagnostic information is written

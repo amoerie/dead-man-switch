@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using DeadManSwitch.Internal;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -31,8 +32,8 @@ namespace DeadManSwitch.Tests
                 _logger, 
                 new DeadManSwitchTaskOneTimeRunner(
                     _logger, 
-                    new DeadManSwitchFactory(_logger, 10), 
-                    new DeadManSwitchTaskExecutor(_logger)
+                    new DeadManSwitchSessionFactory(_logger, 10), 
+                    new DeadManSwitchWorkerScheduler(_logger)
                 )
             );
             _cts = new CancellationTokenSource();
@@ -64,7 +65,7 @@ namespace DeadManSwitch.Tests
                     return Task.CompletedTask;
                 }
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(timeout, delay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(timeout, delay, actions);
     
             // Act
             var results = await _runner.RunInfinitelyAsync(task, _cts.Token).ConfigureAwait(false);
@@ -94,7 +95,7 @@ namespace DeadManSwitch.Tests
                 Do(() => pies.Add(Math.PI)),
                 Do(() => _cts.Cancel())
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(timeout, delay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(timeout, delay, actions);
 
             // Act
             var results = await _runner.RunInfinitelyAsync(task, _cts.Token).ConfigureAwait(false);
@@ -142,7 +143,7 @@ namespace DeadManSwitch.Tests
                     return Task.CompletedTask;
                 }
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(timeout, delay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(timeout, delay, actions);
 
             // Act
             var results = await _runner.RunInfinitelyAsync(task, _cts.Token).ConfigureAwait(false);
@@ -190,7 +191,7 @@ namespace DeadManSwitch.Tests
                     return Task.CompletedTask;
                 }
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(timeout, delay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(timeout, delay, actions);
 
             // Act
             var results = await _runner.RunInfinitelyAsync(task, _cts.Token).ConfigureAwait(false);
@@ -222,7 +223,7 @@ namespace DeadManSwitch.Tests
                     pi = Math.PI;
                 }
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(timeout, delay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(timeout, delay, actions);
 
             // Act
             var run = _runner.RunInfinitelyAsync(task, _cts.Token);
@@ -264,7 +265,7 @@ namespace DeadManSwitch.Tests
                     return Task.CompletedTask;
                 }
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(timeout, delay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(timeout, delay, actions);
 
             // Act
             var run = _runner.RunInfinitelyAsync(task, _cts.Token);
@@ -302,7 +303,7 @@ namespace DeadManSwitch.Tests
                 },
                 Do(() => _cts.Cancel())
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(deadManSwitchTimeout, deadManSwitchDelay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(deadManSwitchTimeout, deadManSwitchDelay, actions);
             
             // Act
             var results = await _runner.RunInfinitelyAsync(task, _cts.Token).ConfigureAwait(false);
@@ -338,7 +339,7 @@ namespace DeadManSwitch.Tests
                 },
                 Do(() => _cts.Cancel())
             };
-            var task = new ConfigurableDeadManSwitchInfiniteTask(deadManSwitchTimeout, deadManSwitchDelay, actions);
+            var task = new ConfigurableDeadManSwitchInfiniteWorker(deadManSwitchTimeout, deadManSwitchDelay, actions);
             
             // Act
             var results = await _runner.RunInfinitelyAsync(task, _cts.Token).ConfigureAwait(false);
@@ -378,7 +379,7 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, ValueTask> Pause()
         {
-            return deadManSwitch => deadManSwitch.PauseAsync();
+            return deadManSwitch => deadManSwitch.SuspendAsync();
         }
 
         private static Func<IDeadManSwitch, ValueTask> Resume()

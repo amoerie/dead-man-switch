@@ -1,10 +1,17 @@
 ﻿using System;
 
-namespace DeadManSwitch
+namespace DeadManSwitch.Internal
 {
-    public class DeadManSwitchNotification
+    internal class DeadManSwitchNotification
     {
+        /// <summary>
+        /// The date and time when the notification occurred
+        /// </summary>
         public DateTime Timestamp { get; }
+        
+        /// <summary>
+        /// The content of the notification
+        /// </summary>
         public string Content { get; }
 
         public DeadManSwitchNotification(string content)

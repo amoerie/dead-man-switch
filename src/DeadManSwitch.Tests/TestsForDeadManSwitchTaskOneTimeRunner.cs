@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DeadManSwitch.Internal;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -31,8 +32,8 @@ namespace DeadManSwitch.Tests
             _cts = new CancellationTokenSource();
             _oneTimeRunner = new DeadManSwitchTaskOneTimeRunner(
                 _logger,
-                new DeadManSwitchFactory(_logger, 10),
-                new DeadManSwitchTaskExecutor(_logger)
+                new DeadManSwitchSessionFactory(_logger, 10),
+                new DeadManSwitchWorkerScheduler(_logger)
             );
         }
 
@@ -52,7 +53,7 @@ namespace DeadManSwitch.Tests
             {
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -72,7 +73,7 @@ namespace DeadManSwitch.Tests
                 Notify("Computing PI"),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -94,7 +95,7 @@ namespace DeadManSwitch.Tests
                 Notify("Computing PI"),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -114,7 +115,7 @@ namespace DeadManSwitch.Tests
                 Sleep(TimeSpan.FromSeconds(1)),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -140,7 +141,7 @@ namespace DeadManSwitch.Tests
                 Notify("Computing PI"),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -162,7 +163,7 @@ namespace DeadManSwitch.Tests
                 Notify("Computing PI"),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -182,7 +183,7 @@ namespace DeadManSwitch.Tests
                 Sleep(TimeSpan.FromSeconds(3)),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -203,7 +204,7 @@ namespace DeadManSwitch.Tests
                 Notify("Computing PI"),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -221,7 +222,7 @@ namespace DeadManSwitch.Tests
                     pi = Math.PI;
                 }
             };
-            task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, nextActions);
+            task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, nextActions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -245,7 +246,7 @@ namespace DeadManSwitch.Tests
                     pi = Math.PI;
                 }
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -268,7 +269,7 @@ namespace DeadManSwitch.Tests
                     pi = Math.PI;
                 }
             };
-            task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, nextActions);
+            task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, nextActions);
 
             // Act
             await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -288,7 +289,7 @@ namespace DeadManSwitch.Tests
                 Sleep(TimeSpan.FromSeconds(3)),
                 Do(_ => pi = Math.PI)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runTask = _oneTimeRunner.RunOneTimeAsync(task, _cts.Token);
@@ -317,7 +318,7 @@ namespace DeadManSwitch.Tests
                 Do(_ => pi = Math.PI),
                 Resume()
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -343,7 +344,7 @@ namespace DeadManSwitch.Tests
                 Pause(),
                 Resume()
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -366,7 +367,7 @@ namespace DeadManSwitch.Tests
                 Sleep(TimeSpan.FromSeconds(3)),
                 Do(_ => pi = Math.PI),
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -397,7 +398,7 @@ namespace DeadManSwitch.Tests
                 Notify("Calculating E"),
                 Do(_ => e = Math.E)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -430,7 +431,7 @@ namespace DeadManSwitch.Tests
                 Notify("Calculating E"),
                 Do(_ => e = Math.E)
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -448,8 +449,8 @@ namespace DeadManSwitch.Tests
             // Arrange
             var runner = new DeadManSwitchTaskOneTimeRunner(
                 _logger,
-                new DeadManSwitchFactory(_logger, 3),
-                new DeadManSwitchTaskExecutor(_logger)
+                new DeadManSwitchSessionFactory(_logger, 3),
+                new DeadManSwitchWorkerScheduler(_logger)
             );
             var deadManSwitchTimeout = TimeSpan.FromSeconds(5);
             List<DeadManSwitchNotification> capturedNotifications = null;
@@ -461,7 +462,7 @@ namespace DeadManSwitch.Tests
                 Notify("Notification 4"),
                 Do(deadManSwitch => { capturedNotifications = deadManSwitch.Notifications.ToList(); })
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await runner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -485,8 +486,8 @@ namespace DeadManSwitch.Tests
             // Arrange
             var runner = new DeadManSwitchTaskOneTimeRunner(
                 _logger,
-                new DeadManSwitchFactory(_logger, 3),
-                new DeadManSwitchTaskExecutor(_logger)
+                new DeadManSwitchSessionFactory(_logger, 3),
+                new DeadManSwitchWorkerScheduler(_logger)
             );
             var deadManSwitchTimeout = TimeSpan.FromSeconds(5);
             List<DeadManSwitchNotification> capturedNotifications = null;
@@ -502,7 +503,7 @@ namespace DeadManSwitch.Tests
                 },
                 Do(deadManSwitch => { capturedNotifications = deadManSwitch.Notifications.ToList(); })
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await runner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -528,7 +529,7 @@ namespace DeadManSwitch.Tests
                 },
                 Do(_ => pi = Math.PI),
             };
-            var task = new ConfigurableDeadManSwitchTask(deadManSwitchTimeout, actions);
+            var task = new ConfigurableDeadManSwitchWorker(deadManSwitchTimeout, actions);
 
             // Act
             var runResult = await _oneTimeRunner.RunOneTimeAsync(task, _cts.Token).ConfigureAwait(false);
@@ -562,7 +563,7 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, Task> Pause()
         {
-            return deadManSwitch => deadManSwitch.PauseAsync().AsTask();
+            return deadManSwitch => deadManSwitch.SuspendAsync().AsTask();
         }
 
         private static Func<IDeadManSwitch, Task> Resume()

@@ -1,6 +1,6 @@
-﻿namespace DeadManSwitch
+﻿namespace DeadManSwitch.Internal
 {
-    public enum DeadManSwitchTaskExecutionResult
+    internal enum DeadManSwitchTaskExecutionResult
     {
         TaskWasCancelled,
         TaskFinishedGracefully,

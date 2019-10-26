@@ -7,7 +7,7 @@ namespace DeadManSwitch
 {
     public interface IDeadManSwitchTaskInfiniteRunner
     {
-        Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteTask task, CancellationToken cancellationToken);
+        Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteWorker task, CancellationToken cancellationToken);
     }
 
     public class DeadManSwitchTaskInfiniteRunner : IDeadManSwitchTaskInfiniteRunner
@@ -22,11 +22,11 @@ namespace DeadManSwitch
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteTask task, CancellationToken cancellationToken)
+        public async Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteWorker task, CancellationToken cancellationToken)
         {
             var result = new DeadManSwitchTaskInfiniteRunnerResult();
 
-            _logger.LogTrace("Running task {TaskName} infinitely using a dead man switch", task.Name);
+            _logger.LogTrace("Running task {WorkerName} infinitely using a dead man's switch", worker.Name);
             
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -44,10 +44,10 @@ namespace DeadManSwitch
                 }
             }
             
-            _logger.LogTrace("Infinite task {TaskName} has been cancelled, these are the results:", task.Name);
-            _logger.LogTrace("Tasks that finished gracefully: {TasksThatFinishedGracefully}", result.TasksThatFinishedGracefully);
-            _logger.LogTrace("Tasks that threw an exception : {TasksThatThrewAnException}", result.TasksThatThrewAnException);
-            _logger.LogTrace("Tasks that were canceled      : {TasksThatWereCanceled}", result.TasksThatWereCanceled);
+            _logger.LogTrace("Infinite task {WorkerName} has been cancelled, these are the results:", worker.Name);
+            _logger.LogTrace("Workers that finished gracefully: {TasksThatFinishedGracefully}", result.TasksThatFinishedGracefully);
+            _logger.LogTrace("Workers that threw an exception : {TasksThatThrewAnException}", result.TasksThatThrewAnException);
+            _logger.LogTrace("Workers that were canceled      : {TasksThatWereCanceled}", result.TasksThatWereCanceled);
             _logger.LogTrace("Dead man switches triggered   : {DeadManSwitchesTriggered}", result.DeadManSwitchesTriggered);
             return result;
         }

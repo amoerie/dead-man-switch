@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace DeadManSwitch.Examples
 {
-    public class ExampleInfiniteTask : IDeadManSwitchInfiniteTask
+    public class Example : IDeadManSwitchInfiniteWorker
     {
         // for diagnostic purposes
         public string Name => "Example one time task";
         
-        // the dead man switch should receive a notification at least every 75s
+        // the dead man's switch should receive a notification at least every 75s
         public TimeSpan Timeout => TimeSpan.FromSeconds(75);
        
         // always wait 1s between every execution
@@ -30,11 +30,11 @@ namespace DeadManSwitch.Examples
 
             await DoSomethingUseful(deadManSwitch.CancellationToken).ConfigureAwait(false);
             
-            // tell the dead man switch to stop the clock
-            await deadManSwitch.PauseAsync().ConfigureAwait(false);
+            // tell the dead man's switch to stop the clock
+            await deadManSwitch.SuspendAsync().ConfigureAwait(false);
             await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelled().ConfigureAwait(false);
             
-            // tell the dead man switch to resume the clock
+            // tell the dead man's switch to resume the clock
             await deadManSwitch.ResumeAsync().ConfigureAwait(false);
         }
 
