@@ -24,9 +24,9 @@ namespace DeadManSwitch.Tests
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
-                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level,-9:w9}] {Message}{NewLine}{Exception}")
+                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level,-9:w9}] {Message}{NewLine}{Exception}")
                 .CreateLogger();
-            _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger, dispose: true); });
+            _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
             _logger = _loggerFactory.CreateLogger<TestsForDeadManSwitchManager>();
             _cts = new CancellationTokenSource();
             _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(_logger));
@@ -180,8 +180,8 @@ namespace DeadManSwitch.Tests
                 // Arrange
                 var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
                 var actions = Actions<double>(
-                    Sleep(TimeSpan.FromSeconds(3)),
-                    Notify("Computing PI")
+                    Notify("Computing PI"),
+                    Sleep(TimeSpan.FromSeconds(3))
                 )(Math.PI);
                 var worker = new ConfigurableDeadManSwitchWorker<double>(actions);
 
@@ -190,10 +190,10 @@ namespace DeadManSwitch.Tests
 
                 // Arrange
                 var nextActions = Actions<double>(
-                    Sleep(TimeSpan.FromSeconds(1)),
-                    Notify("Computing PI")
+                    Notify("Computing PI"),
+                    Sleep(TimeSpan.FromSeconds(1))
                 )(Math.PI);
-                worker = new ConfigurableDeadManSwitchWorker<double>(actions);
+                worker = new ConfigurableDeadManSwitchWorker<double>(nextActions);
 
                 // Act
                 var result = await _manager.RunAsync(worker, options, _cts.Token).ConfigureAwait(false);
@@ -341,7 +341,7 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5)};
+                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(4)};
                 var actions = Actions<double>(
                     Pause(),
                     Notify("Sleeping 6s"),
@@ -394,15 +394,16 @@ namespace DeadManSwitch.Tests
                 actual.Should().BeEquivalentTo(expected);
             }
 
-            [Fact]
-            public async Task ShouldHandleNotificationsInParallel()
+            [Theory]
+            [InlineData(100)]
+            public async Task ShouldHandleNotificationsInParallel(int numberOfNotifications)
             {
                 // Arrange
                 var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5), NumberOfNotificationsToKeep = 3 };
                 var actions = Actions<double>(
                     async (deadManSwitch, cancellationToken) =>
                     {
-                        var sendNotifications = Enumerable.Range(0, 5000)
+                        var sendNotifications = Enumerable.Range(0, numberOfNotifications)
                             .AsParallel()
                             .WithDegreeOfParallelism(100)
                             .Select(i => deadManSwitch.NotifyAsync("Notification " + i, cancellationToken).AsTask());

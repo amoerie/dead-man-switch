@@ -31,7 +31,8 @@ namespace DeadManSwitch.Internal
             var notifications = Channel.CreateBounded<DeadManSwitchNotification>(new BoundedChannelOptions(deadManSwitchOptions.NumberOfNotificationsToKeep)
             {
                 SingleWriter = false,
-                SingleReader = true
+                SingleReader = true,
+                FullMode = BoundedChannelFullMode.DropOldest
             });
             var statuses = Channel.CreateUnbounded<DeadManSwitchStatus>(new UnboundedChannelOptions
             {

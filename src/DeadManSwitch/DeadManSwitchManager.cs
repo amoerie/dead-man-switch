@@ -29,23 +29,30 @@ namespace DeadManSwitch
             if (deadManSwitchWorker == null) throw new ArgumentNullException(nameof(deadManSwitchWorker));
 
             using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(deadManSwitchOptions))
-            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationTokenSource.Token))
+            using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationTokenSource.Token))
             {
                 _logger.LogTrace("Running worker {WorkerName} using a dead man's switch", deadManSwitchWorker.Name);
 
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
 
-                var workerTask = Task.Run(async () => await deadManSwitchWorker.WorkAsync(deadManSwitch, cts.Token).ConfigureAwait(false), cts.Token);
-                var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(cts.Token).ConfigureAwait(false), cts.Token);
+                var workerTask = Task.Run(async () => await deadManSwitchWorker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), workerCTS.Token);
+                var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), watcherCTS.Token);
 
-                var worker = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
-                if (worker == workerTask)
+                var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
+                if (task == workerTask)
                 {
+                    _logger.LogTrace("Cancelling watcher of {WorkerName}", deadManSwitchWorker.Name);
+
+                    watcherCTS.Cancel();
                     return await workerTask.ConfigureAwait(false);
                 }
+                
+                _logger.LogTrace("Cancelling worker {WorkerName}", deadManSwitchWorker.Name);
 
-                throw new OperationCanceledException(cts.Token);
+                workerCTS.Cancel();
+                throw new OperationCanceledException(workerCTS.Token);
             }
         }
     }

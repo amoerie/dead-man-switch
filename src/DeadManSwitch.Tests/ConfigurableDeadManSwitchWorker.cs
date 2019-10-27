@@ -17,9 +17,9 @@ namespace DeadManSwitch.Tests
 
         public string Name => "Configurable worker";
         
-        public Task<TResult> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
+        public async Task<TResult> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
         {
-            return _workAsync(deadManSwitch, cancellationToken);
+            return await _workAsync(deadManSwitch, cancellationToken).ConfigureAwait(false);
         }
     }
 }

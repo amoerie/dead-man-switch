@@ -26,7 +26,7 @@ namespace DeadManSwitch.Internal
 
         public async ValueTask TriggerAsync(CancellationToken cancellationToken)
         {
-            _logger.LogWarning("The worker worker did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
+            _logger.LogWarning("The worker task did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
                                "and will be cancelled.", _deadManSwitchOptions.Timeout.TotalSeconds);
 
             var notifications = (await _deadManSwitchContext.GetNotificationsAsync(cancellationToken).ConfigureAwait(false)).ToList();
