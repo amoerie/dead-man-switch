@@ -1,4 +1,4 @@
-﻿using DeadManSwitch.Internal;
+﻿/*using DeadManSwitch.Internal;
 
 namespace DeadManSwitch
 {
@@ -32,4 +32,4 @@ namespace DeadManSwitch
             }
         }
     }
-}
+}*/

@@ -15,7 +15,7 @@ namespace DeadManSwitch
         string Name { get; }
 
         /// <summary>
-        /// Executes a task using a dead man's switch. If the switch is not notified in a periodical, timely manner, the
+        /// Executes a worker using a dead man's switch. If the switch is not notified in a periodical, timely manner, the
         /// work will be cancelled using the cancellation token.
         /// </summary>
         /// <param name="deadManSwitch">The dead man's switch that should be notified every x seconds.</param>

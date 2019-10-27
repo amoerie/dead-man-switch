@@ -10,7 +10,7 @@ namespace DeadManSwitch.Examples
     public class ExampleInfiniteTaskProgram
     {
         /// <summary>
-        /// Demonstrates how to run (and stop) an infinite task, using a dead man's switch
+        /// Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
         /// </summary>
         public static async Task Main()
         {
@@ -18,23 +18,23 @@ namespace DeadManSwitch.Examples
             var logger = loggerFactory.CreateLogger<ExampleOneTimeTaskProgram>();
             var runner = new DeadManSwitchTaskInfiniteRunner(
                 logger,
-                new DeadManSwitchTaskOneTimeRunner(
+                new DeadManSwitchManager(
                     logger,
                     new DeadManSwitchSessionFactory(logger, 10),
                     new DeadManSwitchWorkerScheduler(logger)
                 )
             );
-            var task = new Example();
+            var worker = new Example();
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
                 // do not await this, it will never complete until you cancel the token
-                var run = runner.RunInfinitelyAsync(task, cancellationTokenSource.Token);
+                var run = runner.RunInfinitelyAsync(worker, cancellationTokenSource.Token);
                 
                 // let it run for 10s.
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token).ConfigureAwait(false);
 
-                // now stop the infinite task
+                // now stop the infinite worker
                 cancellationTokenSource.Cancel();
 
                 // collect the results

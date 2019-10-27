@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Internal
 {
-    internal interface IDeadManSwitchTriggerer
+    public interface IDeadManSwitchTriggerer
     {
         ValueTask TriggerAsync(CancellationToken cancellationToken);
     }
 
-    internal sealed class DeadManSwitchTriggerer : IDeadManSwitchTriggerer
+    public sealed class DeadManSwitchTriggerer : IDeadManSwitchTriggerer
     {
         private readonly IDeadManSwitchContext _deadManSwitchContext;
         private readonly DeadManSwitchOptions _deadManSwitchOptions;
@@ -26,7 +26,7 @@ namespace DeadManSwitch.Internal
 
         public async ValueTask TriggerAsync(CancellationToken cancellationToken)
         {
-            _logger.LogWarning("The worker task did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
+            _logger.LogWarning("The worker worker did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
                                "and will be cancelled.", _deadManSwitchOptions.Timeout.TotalSeconds);
 
             var notifications = (await _deadManSwitchContext.GetNotificationsAsync(cancellationToken).ConfigureAwait(false)).ToList();

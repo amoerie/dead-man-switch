@@ -2,14 +2,14 @@
 
 namespace DeadManSwitch.Internal
 {
-    internal interface IDeadManSwitchSession : IDisposable
+    public interface IDeadManSwitchSession : IDisposable
     {
         IDeadManSwitchContext DeadManSwitchContext { get; }
         IDeadManSwitch DeadManSwitch { get; }
         IDeadManSwitchWatcher DeadManSwitchWatcher { get; }
     }
     
-    internal sealed class DeadManSwitchSession : IDeadManSwitchSession 
+    public sealed class DeadManSwitchSession : IDeadManSwitchSession 
     {
         public IDeadManSwitchContext DeadManSwitchContext { get; }
         public IDeadManSwitch DeadManSwitch { get; }

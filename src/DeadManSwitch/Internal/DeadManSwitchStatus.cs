@@ -1,6 +1,6 @@
 ﻿namespace DeadManSwitch.Internal
 {
-    internal enum DeadManSwitchStatus
+    public enum DeadManSwitchStatus
     {
         /// <summary>
         /// Happy case: we received a notification within the timeout

@@ -3,12 +3,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Internal
 {
-    internal interface IDeadManSwitchSessionFactory
+    public interface IDeadManSwitchSessionFactory
     {
         IDeadManSwitchSession Create(DeadManSwitchOptions deadManSwitchOptions);
     }
 
-    internal class DeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
+    public class DeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
     {
         private readonly ILogger _logger;
 

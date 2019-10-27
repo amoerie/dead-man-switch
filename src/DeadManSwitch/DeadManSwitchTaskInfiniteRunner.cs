@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -7,7 +7,7 @@ namespace DeadManSwitch
 {
     public interface IDeadManSwitchTaskInfiniteRunner
     {
-        Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteWorker task, CancellationToken cancellationToken);
+        Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteWorker worker, CancellationToken cancellationToken);
     }
 
     public class DeadManSwitchTaskInfiniteRunner : IDeadManSwitchTaskInfiniteRunner
@@ -22,21 +22,21 @@ namespace DeadManSwitch
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteWorker task, CancellationToken cancellationToken)
+        public async Task<DeadManSwitchTaskInfiniteRunnerResult> RunInfinitelyAsync(IDeadManSwitchInfiniteWorker worker, CancellationToken cancellationToken)
         {
             var result = new DeadManSwitchTaskInfiniteRunnerResult();
 
-            _logger.LogTrace("Running task {WorkerName} infinitely using a dead man's switch", worker.Name);
+            _logger.LogTrace("Running worker {WorkerName} infinitely using a dead man's switch", worker.Name);
             
             while (!cancellationToken.IsCancellationRequested)
             {
-                var oneTimeResult = await _deadManSwitchTaskOneTimeRunner.RunOneTimeAsync(task, cancellationToken).ConfigureAwait(false);
+                var oneTimeResult = await _deadManSwitchTaskOneTimeRunner.RunOneTimeAsync(worker, cancellationToken).ConfigureAwait(false);
 
                 result.Report(oneTimeResult.DeadManSwitchTaskExecutionResult, oneTimeResult.DeadManSwitchResult);
 
                 try
                 {
-                    await Task.Delay(task.Delay, cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(worker.Delay, cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {
@@ -44,7 +44,7 @@ namespace DeadManSwitch
                 }
             }
             
-            _logger.LogTrace("Infinite task {WorkerName} has been cancelled, these are the results:", worker.Name);
+            _logger.LogTrace("Infinite worker {WorkerName} has been cancelled, these are the results:", worker.Name);
             _logger.LogTrace("Workers that finished gracefully: {TasksThatFinishedGracefully}", result.TasksThatFinishedGracefully);
             _logger.LogTrace("Workers that threw an exception : {TasksThatThrewAnException}", result.TasksThatThrewAnException);
             _logger.LogTrace("Workers that were canceled      : {TasksThatWereCanceled}", result.TasksThatWereCanceled);
@@ -52,4 +52,4 @@ namespace DeadManSwitch
             return result;
         }
     }
-}
+}*/

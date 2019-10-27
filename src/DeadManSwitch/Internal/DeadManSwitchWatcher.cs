@@ -5,12 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Internal
 {
-    internal interface IDeadManSwitchWatcher
+    public interface IDeadManSwitchWatcher
     {
-        ValueTask<DeadManSwitchResult> WatchAsync(CancellationToken cancellationToken);
+        ValueTask WatchAsync(CancellationToken cancellationToken);
     }
 
-    internal sealed class DeadManSwitchWatcher : IDeadManSwitchWatcher
+    public sealed class DeadManSwitchWatcher : IDeadManSwitchWatcher
     {
         private readonly IDeadManSwitchContext _context;
         private readonly DeadManSwitchOptions _options;
@@ -29,12 +29,12 @@ namespace DeadManSwitch.Internal
         }
 
         /// <summary>
-        /// Starts a task that watches the dead man's switch.
+        /// Starts a worker that watches the dead man's switch.
         /// When no notifications are received within the proper timeout period, the <see cref="CancellationToken"/> will be cancelled automatically.
-        /// You should pass this cancellation token to any task that must be cancelled.
+        /// You should pass this cancellation token to any worker that must be cancelled.
         /// </summary>
         /// <returns>A value indicating whether the dead man's switch triggered or not</returns>
-        public async ValueTask<DeadManSwitchResult> WatchAsync(CancellationToken cancellationToken)
+        public async ValueTask WatchAsync(CancellationToken cancellationToken)
         {
             _logger.LogDebug("Watching dead man's switch");
 
@@ -60,7 +60,7 @@ namespace DeadManSwitch.Internal
                             catch (OperationCanceledException)
                             {
                                 _logger.LogDebug("Dead man switch was canceled while waiting to be resumed.");
-                                return DeadManSwitchResult.DeadManSwitchWasNotTriggered;
+                                return;
                             }
                         }
 
@@ -81,13 +81,13 @@ namespace DeadManSwitch.Internal
                                 {
                                     await _deadManSwitchTriggerer.TriggerAsync(cancellationToken).ConfigureAwait(false);
 
-                                    return DeadManSwitchResult.DeadManSwitchWasTriggered;
+                                    return;
                                 }
 
                                 if (cancellationToken.IsCancellationRequested)
                                 {
                                     _logger.LogDebug("Dead man switch watcher was canceled while waiting for the next notification");
-                                    return DeadManSwitchResult.DeadManSwitchWasNotTriggered;
+                                    return;
                                 }
                             }
                         }
@@ -97,7 +97,6 @@ namespace DeadManSwitch.Internal
             }
 
             _logger.LogDebug("Dead man switch watcher was canceled");
-            return DeadManSwitchResult.DeadManSwitchWasNotTriggered;
         }
     }
 }
