@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using DeadManSwitch.Internal;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Examples
 {
-    public class ExampleOneTimeTaskProgram
+    public class ExampleProgram
     {
         /// <summary>
         /// Demonstrates how you can run a worker once, using a dead man's switch
@@ -14,23 +15,26 @@ namespace DeadManSwitch.Examples
         public async Task Main()
         {
             var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-            var logger = loggerFactory.CreateLogger<ExampleOneTimeTaskProgram>();
-            var runner = new DeadManSwitchManager(
+            var logger = loggerFactory.CreateLogger<ExampleProgram>();
+            var runner = new DeadManSwitchRunner(
                 logger,
-                new DeadManSwitchSessionFactory(logger, 10),
-                new DeadManSwitchWorkerScheduler(logger)
+                new DeadManSwitchSessionFactory(logger)
             );
-            var worker = new ExampleOneTime();
+            var worker = new ExampleWorker();
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var run = runner.RunOneTimeAsync(worker, cancellationTokenSource.Token);
+                var options = new DeadManSwitchOptions
+                {
+                    Timeout = TimeSpan.FromSeconds(60)
+                };
+                var run = runner.RunAsync(worker, options, cancellationTokenSource.Token);
 
                 // if you want to cancel at some point: cancellationTokenSource.Cancel();
 
                 var result = await run.ConfigureAwait(false);
 
-                Debug.Assert(result.DeadManSwitchResult == DeadManSwitchResult.DeadManSwitchWasTriggered);
+                Debug.Assert(result == Math.PI);
             }
         }
     }

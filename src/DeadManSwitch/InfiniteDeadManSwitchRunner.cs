@@ -32,11 +32,12 @@ namespace DeadManSwitch
             {
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
+                var deadManSwitchContext = deadManSwitchSession.DeadManSwitchContext;
                 var watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationTokenSource.Token))
+                    using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchContext.CancellationTokenSource.Token))
                     {
                         _logger.LogTrace("Running worker {WorkerName} using a dead man's switch", worker.Name);
 
