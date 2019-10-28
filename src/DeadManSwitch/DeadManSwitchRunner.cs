@@ -6,38 +6,38 @@ using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch
 {
-    public interface IDeadManSwitchManager
+    public interface IDeadManSwitchRunner
     {
-        Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> deadManSwitchWorker, DeadManSwitchOptions deadManSwitchOptions, CancellationToken cancellationToken);
+        Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> worker, DeadManSwitchOptions options, CancellationToken cancellationToken);
     }
 
-    public class DeadManSwitchManager : IDeadManSwitchManager
+    public class DeadManSwitchRunner : IDeadManSwitchRunner
     {
         private readonly IDeadManSwitchSessionFactory _deadManSwitchSessionFactory;
         private readonly ILogger _logger;
 
-        public DeadManSwitchManager(ILogger logger,
+        public DeadManSwitchRunner(ILogger logger,
             IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
         {
             _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> deadManSwitchWorker, DeadManSwitchOptions deadManSwitchOptions,
+        public async Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> worker, DeadManSwitchOptions options,
             CancellationToken cancellationToken)
         {
-            if (deadManSwitchWorker == null) throw new ArgumentNullException(nameof(deadManSwitchWorker));
+            if (worker == null) throw new ArgumentNullException(nameof(worker));
 
-            using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(deadManSwitchOptions))
+            using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options))
             using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationTokenSource.Token))
             {
-                _logger.LogTrace("Running worker {WorkerName} using a dead man's switch", deadManSwitchWorker.Name);
+                _logger.LogTrace("Running worker {WorkerName} using a dead man's switch", worker.Name);
 
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
 
-                var workerTask = Task.Run(async () => await deadManSwitchWorker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), workerCTS.Token);
+                var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), workerCTS.Token);
                 var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), watcherCTS.Token);
 
                 var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
