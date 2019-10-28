@@ -19,7 +19,7 @@ namespace DeadManSwitch.Internal
     
     public sealed class DeadManSwitchContext : IDeadManSwitchContext
     {
-        private readonly DeadManSwitchOptions _deadManSwitchOptions;
+        private readonly int _numberOfNotificationsToKeep;
         private readonly ChannelWriter<DeadManSwitchNotification> _notificationsWriter;
         private readonly ChannelReader<DeadManSwitchNotification> _notificationsReader;
         private readonly ChannelReader<DeadManSwitchStatus> _statusesReader;
@@ -27,7 +27,8 @@ namespace DeadManSwitch.Internal
 
         public DeadManSwitchContext(DeadManSwitchOptions deadManSwitchOptions)
         {
-            _deadManSwitchOptions = deadManSwitchOptions ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
+            if (deadManSwitchOptions == null) throw new ArgumentNullException(nameof(deadManSwitchOptions));
+            
             var notifications = Channel.CreateBounded<DeadManSwitchNotification>(new BoundedChannelOptions(deadManSwitchOptions.NumberOfNotificationsToKeep)
             {
                 SingleWriter = false,
@@ -39,6 +40,7 @@ namespace DeadManSwitch.Internal
                 SingleWriter = false,
                 SingleReader = true
             });
+            _numberOfNotificationsToKeep = deadManSwitchOptions.NumberOfNotificationsToKeep;
             _notificationsReader = notifications.Reader;
             _notificationsWriter = notifications.Writer;
             _statusesReader = statuses.Reader;
@@ -66,7 +68,7 @@ namespace DeadManSwitch.Internal
         
         public ValueTask<IEnumerable<DeadManSwitchNotification>> GetNotificationsAsync(CancellationToken cancellationToken)
         {
-            var notifications = new List<DeadManSwitchNotification>(_deadManSwitchOptions.NumberOfNotificationsToKeep);
+            var notifications = new List<DeadManSwitchNotification>(_numberOfNotificationsToKeep);
             while (_notificationsReader.TryRead(out var notification))
                 notifications.Add(notification);
             return new ValueTask<IEnumerable<DeadManSwitchNotification>>(notifications);

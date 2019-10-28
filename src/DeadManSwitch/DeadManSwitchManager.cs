@@ -43,14 +43,10 @@ namespace DeadManSwitch
                 var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
                 if (task == workerTask)
                 {
-                    _logger.LogTrace("Cancelling watcher of {WorkerName}", deadManSwitchWorker.Name);
-
                     watcherCTS.Cancel();
                     return await workerTask.ConfigureAwait(false);
                 }
                 
-                _logger.LogTrace("Cancelling worker {WorkerName}", deadManSwitchWorker.Name);
-
                 workerCTS.Cancel();
                 throw new OperationCanceledException(workerCTS.Token);
             }
