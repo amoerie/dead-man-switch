@@ -90,9 +90,9 @@ namespace DeadManSwitch.Tests
             var workItems = WorkItems(
                 Work(
                     Notify("Going to sleep for 5 seconds"),
-                    Do(_ => _logger.LogInformation("In loop 1, this should be aborted")),
+                    Do(_ => _logger.LogInformation("In loop 1, this should be cancelled")),
                     Sleep(TimeSpan.FromSeconds(5)),
-                    Do(_ => _logger.LogInformation("In loop 1, thread was not aborted!!!")),
+                    Do(_ => _logger.LogInformation("In loop 1, task was not aborted!!!")),
                     Do(_ => e = Math.E)
                 ),
                 Work(

@@ -8,8 +8,8 @@ namespace DeadManSwitch.Internal
 {
     public interface IDeadManSwitchContext : IDisposable
     {
-        CancellationTokenSource CancellationTokenSource { get; }
-        
+        CancellationTokenSource CancellationTokenSource { get; set; }
+
         ValueTask EnqueueStatusAsync(DeadManSwitchStatus deadManSwitchStatus, CancellationToken cancellationToken);
         ValueTask<DeadManSwitchStatus> DequeueStatusAsync(CancellationToken cancellationToken);
 
@@ -49,7 +49,7 @@ namespace DeadManSwitch.Internal
             CancellationTokenSource = new CancellationTokenSource();
         }
 
-        public CancellationTokenSource CancellationTokenSource { get; }
+        public CancellationTokenSource CancellationTokenSource { get; set; }
 
         public ValueTask EnqueueStatusAsync(DeadManSwitchStatus deadManSwitchStatus, CancellationToken cancellationToken)
         {

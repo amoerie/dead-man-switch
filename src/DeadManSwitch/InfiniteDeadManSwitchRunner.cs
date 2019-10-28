@@ -32,7 +32,7 @@ namespace DeadManSwitch
             {
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
-                var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), watcherCTS.Token);
+                var watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
                 while (!cancellationToken.IsCancellationRequested)
                 {
@@ -40,21 +40,40 @@ namespace DeadManSwitch
                     {
                         _logger.LogTrace("Running worker {WorkerName} using a dead man's switch", worker.Name);
 
-                        var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), workerCTS.Token);
+                        var workerTask = Task.Run(() => worker.WorkAsync(deadManSwitch, workerCTS.Token), CancellationToken.None);
 
-                        var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
-                        if (task == watcherTask)
-                        {
-                            workerCTS.Cancel();
-                            watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), watcherCTS.Token);
-                        }
-                        else
+                        try
                         {
                             await workerTask.ConfigureAwait(false);
-                            await deadManSwitch.NotifyAsync("Worker task completed gracefully", cancellationToken).ConfigureAwait(false);
+                            
+                            _logger.LogDebug("Worker {WorkerName} completed gracefully", worker.Name);
+                            
+                            await deadManSwitch.NotifyAsync("Worker task completed gracefully", CancellationToken.None).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            _logger.LogWarning("Worker {WorkerName} was canceled");
+                            
+                            // Restart watcher
+                            await watcherTask.ConfigureAwait(false);
+                            
+                            await deadManSwitch.NotifyAsync("Worker task was canceled", CancellationToken.None).ConfigureAwait(false);
+                            
+                            watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                        }
+                        catch (Exception exception)
+                        {
+                            _logger.LogError(exception, "Worker {WorkerName} threw an exception", exception);
+                            
+                            await deadManSwitch.NotifyAsync("Worker task threw an exception", CancellationToken.None).ConfigureAwait(false);
                         }
                     }
                 }
+
+                _logger.LogInformation("Infinite runner was canceled. Cleaning up.");
+
+                watcherCTS.Cancel();
+                await watcherTask.ConfigureAwait(false);
             }
         }
     }

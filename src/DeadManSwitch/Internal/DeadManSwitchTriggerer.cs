@@ -39,6 +39,8 @@ namespace DeadManSwitch.Internal
             }
 
             _deadManSwitchContext.CancellationTokenSource.Cancel();
+            _deadManSwitchContext.CancellationTokenSource.Dispose();
+            _deadManSwitchContext.CancellationTokenSource = new CancellationTokenSource();
         }
     }
 }

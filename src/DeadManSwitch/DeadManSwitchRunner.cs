@@ -37,8 +37,8 @@ namespace DeadManSwitch
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
 
-                var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), workerCTS.Token);
-                var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), watcherCTS.Token);
+                var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), CancellationToken.None);
+                var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), CancellationToken.None);
 
                 var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
                 if (task == workerTask)
