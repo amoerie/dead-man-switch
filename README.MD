@@ -3,7 +3,7 @@
 [![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/build-and-test/badge.svg)](https://github.com/amoerie/dead-man-switch/actions)
 
 
-According to a Wikipedia, a **dead man's switch** is
+According to Wikipedia, a **dead man's switch** is
 
 > ... a switch that is designed to be activated or deactivated if the human operator becomes incapacitated, such as through death, loss of consciousness, or being bodily removed from control. Originally applied to switches on a vehicle or machine, it has since come to be used to describe other intangible uses like in computer software.
 
