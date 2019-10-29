@@ -1,6 +1,6 @@
 # 💀 The Dead Man's Switch
 
-[![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/build-and-test/badge.svg)](https://github.com/amoerie/dead-man-switch/actions)
+[![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/build/badge.svg)](https://github.com/amoerie/dead-man-switch/actions)
 
 
 According to Wikipedia, a [**dead man's switch**](https://en.wikipedia.org/wiki/Dead_man%27s_switch) is
