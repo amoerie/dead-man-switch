@@ -24,12 +24,12 @@ namespace DeadManSwitch.Tests
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
-                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {Message}{NewLine}{Exception}")
+                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
             _logger = _loggerFactory.CreateLogger<TestsForDeadManSwitchRunner>();
-            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(_logger));
-            _runner = new DeadManSwitchRunner(_logger, _sessionFactory);
+            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(_loggerFactory));
+            _runner = new DeadManSwitchRunner(_loggerFactory.CreateLogger<DeadManSwitchRunner>(), _sessionFactory);
         }
 
         protected virtual void Dispose(bool disposing)

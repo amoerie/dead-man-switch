@@ -14,9 +14,9 @@ namespace DeadManSwitch
     public class DeadManSwitchRunner : IDeadManSwitchRunner
     {
         private readonly IDeadManSwitchSessionFactory _deadManSwitchSessionFactory;
-        private readonly ILogger _logger;
+        private readonly ILogger<DeadManSwitchRunner> _logger;
 
-        public DeadManSwitchRunner(ILogger logger,
+        public DeadManSwitchRunner(ILogger<DeadManSwitchRunner> logger,
             IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
         {
             _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));

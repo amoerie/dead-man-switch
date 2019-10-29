@@ -37,16 +37,20 @@ namespace DeadManSwitch
     public sealed class DeadManSwitch : IDeadManSwitch
     {
         private readonly IDeadManSwitchContext _context;
+        private readonly ILogger<DeadManSwitch> _logger;
 
-        public DeadManSwitch(IDeadManSwitchContext context)
+        public DeadManSwitch(IDeadManSwitchContext context, ILogger<DeadManSwitch> logger)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async ValueTask NotifyAsync(string notification, CancellationToken cancellationToken = default)
         {
             if (notification == null) throw new ArgumentNullException(nameof(notification));
 
+            _logger.LogDebug("The dead man's switch received a notification: {Notification}", notification);
+            
             var enqueueStatus = _context.EnqueueStatusAsync(DeadManSwitchStatus.NotificationReceived, cancellationToken);
             var addNotification = _context.AddNotificationAsync(new DeadManSwitchNotification(notification), cancellationToken);
 
@@ -56,11 +60,15 @@ namespace DeadManSwitch
 
         public ValueTask SuspendAsync(CancellationToken cancellationToken = default)
         {
+            _logger.LogDebug("The dead man's switch received a 'suspend' call");
+
             return _context.EnqueueStatusAsync(DeadManSwitchStatus.Suspended, cancellationToken);
         }
 
         public ValueTask ResumeAsync(CancellationToken cancellationToken = default)
         {
+            _logger.LogDebug("The dead man's switch received a 'resume' call");
+
             return _context.EnqueueStatusAsync(DeadManSwitchStatus.Resumed, cancellationToken);
         }
     }

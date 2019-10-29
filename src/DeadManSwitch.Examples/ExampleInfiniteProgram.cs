@@ -14,10 +14,9 @@ namespace DeadManSwitch.Examples
         public static async Task Main()
         {
             var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-            var logger = loggerFactory.CreateLogger<ExampleProgram>();
             var runner = new InfiniteDeadManSwitchRunner(
-                logger,
-                new DeadManSwitchSessionFactory(logger)
+                loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(),
+                new DeadManSwitchSessionFactory(loggerFactory)
             );
             var worker = new ExampleInfiniteWorker();
 

@@ -15,10 +15,9 @@ namespace DeadManSwitch.Examples
         public async Task Main()
         {
             var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-            var logger = loggerFactory.CreateLogger<ExampleProgram>();
             var runner = new DeadManSwitchRunner(
-                logger,
-                new DeadManSwitchSessionFactory(logger)
+                loggerFactory.CreateLogger<DeadManSwitchRunner>(),
+                new DeadManSwitchSessionFactory(loggerFactory)
             );
             var worker = new ExampleWorker();
 

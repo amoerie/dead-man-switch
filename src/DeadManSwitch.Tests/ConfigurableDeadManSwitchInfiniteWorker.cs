@@ -10,7 +10,7 @@ namespace DeadManSwitch.Tests
     {
         private List<Func<IDeadManSwitch, CancellationToken, Task>> Iterations { get; }
         
-        private int _iterationIndex = 0;
+        private int _iterationIndex;
 
         public ConfigurableDeadManSwitchInfiniteWorker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> iterations)
         {
@@ -24,11 +24,13 @@ namespace DeadManSwitch.Tests
             if (deadManSwitch == null) throw new ArgumentNullException(nameof(deadManSwitch));
             
             if (cancellationToken.IsCancellationRequested)
-                return;
+                throw new OperationCanceledException(cancellationToken);
             
             if (_iterationIndex < Iterations.Count)
             {
-                await Iterations[_iterationIndex++](deadManSwitch, cancellationToken).ConfigureAwait(false);
+                var iteration = Iterations[_iterationIndex];
+                _iterationIndex++;
+                await iteration(deadManSwitch, cancellationToken).ConfigureAwait(false);
             }
             else
             {

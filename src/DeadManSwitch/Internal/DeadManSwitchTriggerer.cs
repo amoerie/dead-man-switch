@@ -38,9 +38,14 @@ namespace DeadManSwitch.Internal
                 _logger.LogWarning("{NotificationTimestamp} {NotificationContent}", notification.Timestamp, notification.Content);
             }
 
-            _deadManSwitchContext.CancellationTokenSource.Cancel();
-            _deadManSwitchContext.CancellationTokenSource.Dispose();
+            var cancellationTokenSource = _deadManSwitchContext.CancellationTokenSource;
+
             _deadManSwitchContext.CancellationTokenSource = new CancellationTokenSource();
+            
+            _logger.LogTrace("Marking worker cancellation token as cancelled");
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource.Dispose();
+            
         }
     }
 }
