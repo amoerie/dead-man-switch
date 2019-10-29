@@ -8,9 +8,6 @@ namespace DeadManSwitch.Examples
     {
         // for diagnostic purposes
         public string Name => "Example one time worker";
-
-        // the dead man's switch should receive a notification at least every 75s
-        public TimeSpan Timeout => TimeSpan.FromSeconds(75);
         
         public async Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
         {
