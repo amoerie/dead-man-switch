@@ -15,4 +15,8 @@ In .NET, a dead man's switch is designed to detect a process that is no longer m
 
 # Getting started
 
-See [the examples](https://github.com/amoerie/dead-man-switch/tree/master/src/DeadManSwitch.Examples)
+See [the examples](https://github.com/amoerie/dead-man-switch/tree/master/src/DeadManSwitch.Examples) for a sample program that notifies the dead man's switch.
+
+# NuGet
+
+Coming soon
