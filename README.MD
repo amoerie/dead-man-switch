@@ -1,6 +1,6 @@
 # 💀 The Dead Man's Switch
 
-[![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/.NET+Core/badge.svg)](https://github.com/amoerie/dead-man-switch/actions)
+[![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/dotnetcore/badge.svg)](https://github.com/amoerie/dead-man-switch/actions)
 
 
 According to a Wikipedia, a **dead man's switch** is
