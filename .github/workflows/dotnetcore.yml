@@ -30,3 +30,18 @@ jobs:
       run: dotnet build ./src/DeadManSwitch.sln --configuration Release
     - name: Test with dotnet
       run: dotnet test ./src/DeadManSwitch.sln --configuration Release
+      
+  build_macOS:
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Build with dotnet
+      run: dotnet build ./src/DeadManSwitch.sln --configuration Release
+    - name: Test with dotnet
+      run: dotnet test ./src/DeadManSwitch.sln --configuration Release
+
