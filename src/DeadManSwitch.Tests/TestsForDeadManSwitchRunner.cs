@@ -25,7 +25,8 @@ namespace DeadManSwitch.Tests
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
-                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level,-9:w9}] {Message}{NewLine}{Exception}")
+                .Enrich.WithThreadId()
+                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {Message}{NewLine}{Exception}")
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
             _logger = _loggerFactory.CreateLogger<TestsForDeadManSwitchRunner>();

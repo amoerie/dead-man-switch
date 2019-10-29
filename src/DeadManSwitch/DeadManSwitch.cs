@@ -37,25 +37,21 @@ namespace DeadManSwitch
     public sealed class DeadManSwitch : IDeadManSwitch
     {
         private readonly IDeadManSwitchContext _context;
-        private readonly ILogger _logger;
 
-        public DeadManSwitch(IDeadManSwitchContext context, ILogger logger)
+        public DeadManSwitch(IDeadManSwitchContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async ValueTask NotifyAsync(string notification, CancellationToken cancellationToken = default)
         {
-            _logger.LogTrace("Received notification: {Notification}", notification);
-
             if (notification == null) throw new ArgumentNullException(nameof(notification));
 
-            var addNotification = _context.AddNotificationAsync(new DeadManSwitchNotification(notification), cancellationToken);
             var enqueueStatus = _context.EnqueueStatusAsync(DeadManSwitchStatus.NotificationReceived, cancellationToken);
+            var addNotification = _context.AddNotificationAsync(new DeadManSwitchNotification(notification), cancellationToken);
 
-            await addNotification.ConfigureAwait(false);
             await enqueueStatus.ConfigureAwait(false);
+            await addNotification.ConfigureAwait(false);
         }
 
         public ValueTask SuspendAsync(CancellationToken cancellationToken = default)

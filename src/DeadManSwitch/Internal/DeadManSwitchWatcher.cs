@@ -44,7 +44,6 @@ namespace DeadManSwitch.Internal
             {
                 if (status == DeadManSwitchStatus.Suspended)
                 {
-                    _logger.LogDebug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");
 
                     // ignore any notifications and wait until the switch goes through the 'Resumed' status
                     while (status != DeadManSwitchStatus.Resumed)
@@ -85,6 +84,16 @@ namespace DeadManSwitch.Internal
                             return;
                         }
                     }
+                }
+
+                switch (status)
+                {
+                    case DeadManSwitchStatus.NotificationReceived:
+                        _logger.LogDebug("The dead man's switch received another notification.");
+                        break;
+                    case DeadManSwitchStatus.Suspended:
+                        _logger.LogDebug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");
+                        break;
                 }
             }
 

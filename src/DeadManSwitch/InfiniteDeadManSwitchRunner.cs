@@ -62,12 +62,6 @@ namespace DeadManSwitch
                             
                             watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                         }
-                        catch (Exception exception)
-                        {
-                            _logger.LogError(exception, "Worker {WorkerName} threw an exception", exception);
-                            
-                            await deadManSwitch.NotifyAsync("Worker task threw an exception", CancellationToken.None).ConfigureAwait(false);
-                        }
                     }
                 }
 

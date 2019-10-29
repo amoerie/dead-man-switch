@@ -9,6 +9,7 @@ namespace DeadManSwitch.Tests
     public class ConfigurableDeadManSwitchInfiniteWorker : IInfiniteDeadManSwitchWorker
     {
         private List<Func<IDeadManSwitch, CancellationToken, Task>> Iterations { get; }
+        
         private int _iterationIndex = 0;
 
         public ConfigurableDeadManSwitchInfiniteWorker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> iterations)

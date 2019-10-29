@@ -20,7 +20,7 @@ namespace DeadManSwitch.Internal
         public IDeadManSwitchSession Create(DeadManSwitchOptions deadManSwitchOptions)
         {
             var deadManSwitchContext = new DeadManSwitchContext(deadManSwitchOptions);
-            var deadManSwitch = new DeadManSwitch(deadManSwitchContext, _logger);
+            var deadManSwitch = new DeadManSwitch(deadManSwitchContext);
             var deadManSwitchTriggerer = new DeadManSwitchTriggerer(deadManSwitchContext, deadManSwitchOptions, _logger);
             var deadManSwitchWatcher = new DeadManSwitchWatcher(deadManSwitchContext, deadManSwitchOptions, deadManSwitchTriggerer, _logger);
             return new DeadManSwitchSession(deadManSwitchContext, deadManSwitch, deadManSwitchWatcher);
