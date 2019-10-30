@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch", "DeadManSwitch.Core\DeadManSwitch.csproj", "{67A74B2C-FF60-42A6-A7BF-E6CF9F4E6C28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch", "DeadManSwitch\DeadManSwitch.csproj", "{67A74B2C-FF60-42A6-A7BF-E6CF9F4E6C28}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch.Tests", "DeadManSwitch.Tests\DeadManSwitch.Tests.csproj", "{4926E5B1-CE92-4037-A737-04EF5D6BC0C8}"
 EndProject
