@@ -12,8 +12,10 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
-    - name: Build with dotnet
+    - name: Build DeadManSwitch
       run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
+    - name: Build DeadManSwitch.AspNetCore
+      run: dotnet build ./src/DeadManSwitch.AspNetCore/DeadManSwitch.AspNetCore.csproj --configuration Release
     - name: Test with dotnet
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release
       
@@ -28,6 +30,8 @@ jobs:
         dotnet-version: 2.2.108
     - name: Build with dotnet
       run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
+    - name: Build DeadManSwitch.AspNetCore
+      run: dotnet build ./src/DeadManSwitch.AspNetCore/DeadManSwitch.AspNetCore.csproj --configuration Release
     - name: Test with dotnet
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
       
@@ -42,6 +46,8 @@ jobs:
         dotnet-version: 2.2.108
     - name: Build with dotnet
       run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
+    - name: Build DeadManSwitch.AspNetCore
+      run: dotnet build ./src/DeadManSwitch.AspNetCore/DeadManSwitch.AspNetCore.csproj --configuration Release
     - name: Test with dotnet
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
 
