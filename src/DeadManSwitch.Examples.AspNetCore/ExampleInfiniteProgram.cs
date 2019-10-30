@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DeadManSwitch.AspNetCore.DependencyInjection;
+using DeadManSwitch.AspNetCore.Logging;
 using DeadManSwitch.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Examples
@@ -13,11 +16,12 @@ namespace DeadManSwitch.Examples
         /// </summary>
         public static async Task Main()
         {
-            var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-            var runner = new InfiniteDeadManSwitchRunner(
-                loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(),
-                new DeadManSwitchSessionFactory(loggerFactory)
-            );
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(builder => builder.AddConsole())
+                .AddDeadManSwitch()
+                .BuildServiceProvider();
+
+            var infiniteRunner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
             var worker = new ExampleInfiniteWorker();
 
             using (var cancellationTokenSource = new CancellationTokenSource())
@@ -27,7 +31,7 @@ namespace DeadManSwitch.Examples
                     Timeout = TimeSpan.FromSeconds(60)
                 };
                 // do not await this, it will never complete until you cancel the token
-                var run = runner.RunAsync(worker, options,  cancellationTokenSource.Token);
+                var run = infiniteRunner.RunAsync(worker, options,  cancellationTokenSource.Token);
                 
                 // let it run for 10s.
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token).ConfigureAwait(false);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
 {
@@ -15,12 +15,12 @@ namespace DeadManSwitch.Internal
         private readonly IDeadManSwitchContext _context;
         private readonly DeadManSwitchOptions _options;
         private readonly IDeadManSwitchTriggerer _deadManSwitchTriggerer;
-        private readonly ILogger _logger;
+        private readonly IDeadManSwitchLogger<DeadManSwitchWatcher> _logger;
 
         public DeadManSwitchWatcher(IDeadManSwitchContext deadManSwitchContext,
             DeadManSwitchOptions deadManSwitchOptions,
             IDeadManSwitchTriggerer deadManSwitchTriggerer,
-            ILogger logger)
+            IDeadManSwitchLogger<DeadManSwitchWatcher> logger)
         {
             _context = deadManSwitchContext ?? throw new ArgumentNullException(nameof(deadManSwitchContext));
             _options = deadManSwitchOptions ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
@@ -36,7 +36,7 @@ namespace DeadManSwitch.Internal
         /// <returns>A value indicating whether the dead man's switch triggered or not</returns>
         public async ValueTask WatchAsync(CancellationToken cancellationToken)
         {
-            _logger.LogDebug("Watching dead man's switch");
+            _logger.Debug("Watching dead man's switch");
 
             var status = DeadManSwitchStatus.NotificationReceived;
 
@@ -44,7 +44,7 @@ namespace DeadManSwitch.Internal
             {
                 if (status == DeadManSwitchStatus.Suspended)
                 {
-                    _logger.LogDebug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");
+                    _logger.Debug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");
 
                     // ignore any notifications and wait until the switch goes through the 'Resumed' status
                     while (status != DeadManSwitchStatus.Resumed)
@@ -55,12 +55,12 @@ namespace DeadManSwitch.Internal
                         }
                         catch (OperationCanceledException)
                         {
-                            _logger.LogDebug("Dead man switch was canceled while waiting to be resumed.");
+                            _logger.Debug("Dead man switch was canceled while waiting to be resumed.");
                             return;
                         }
                     }
 
-                    _logger.LogDebug("The dead man's switch is now resuming.");
+                    _logger.Debug("The dead man's switch is now resuming.");
                 }
 
                 using (var timeoutCTS = new CancellationTokenSource(_options.Timeout))
@@ -74,7 +74,7 @@ namespace DeadManSwitch.Internal
                     {
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            _logger.LogDebug("Dead man switch watcher was canceled while waiting for the next notification");
+                            _logger.Debug("Dead man switch watcher was canceled while waiting for the next notification");
                             return;
                         }
 
@@ -88,7 +88,7 @@ namespace DeadManSwitch.Internal
                 }
             }
 
-            _logger.LogDebug("Dead man switch watcher was canceled");
+            _logger.Debug("Dead man switch watcher was canceled");
         }
     }
 }

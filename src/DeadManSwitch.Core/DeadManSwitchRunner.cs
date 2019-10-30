@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DeadManSwitch.Internal;
-using Microsoft.Extensions.Logging;
+using DeadManSwitch.Logging;
 
 namespace DeadManSwitch
 {
@@ -14,9 +14,9 @@ namespace DeadManSwitch
     public class DeadManSwitchRunner : IDeadManSwitchRunner
     {
         private readonly IDeadManSwitchSessionFactory _deadManSwitchSessionFactory;
-        private readonly ILogger<DeadManSwitchRunner> _logger;
+        private readonly IDeadManSwitchLogger<DeadManSwitchRunner> _logger;
 
-        public DeadManSwitchRunner(ILogger<DeadManSwitchRunner> logger,
+        public DeadManSwitchRunner(IDeadManSwitchLogger<DeadManSwitchRunner> logger,
             IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
         {
             _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
@@ -32,7 +32,7 @@ namespace DeadManSwitch
             using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationTokenSource.Token))
             {
-                _logger.LogTrace("Running worker {WorkerName} using a dead man's switch", worker.Name);
+                _logger.Trace("Running worker {WorkerName} using a dead man's switch", worker.Name);
 
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;

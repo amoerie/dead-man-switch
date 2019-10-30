@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DeadManSwitch.AspNetCore.Logging;
 using DeadManSwitch.Internal;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -27,9 +28,10 @@ namespace DeadManSwitch.Tests
                 .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
+            var deadManSwitchLoggerFactory = new DeadManSwitchLoggerFactory(_loggerFactory);
             _logger = _loggerFactory.CreateLogger<TestsForDeadManSwitchRunner>();
-            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(_loggerFactory));
-            _runner = new DeadManSwitchRunner(_loggerFactory.CreateLogger<DeadManSwitchRunner>(), _sessionFactory);
+            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(deadManSwitchLoggerFactory));
+            _runner = new DeadManSwitchRunner(deadManSwitchLoggerFactory.CreateLogger<DeadManSwitchRunner>(), _sessionFactory);
         }
 
         protected virtual void Dispose(bool disposing)

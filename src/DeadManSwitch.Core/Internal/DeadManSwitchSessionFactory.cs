@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
 {
@@ -9,9 +9,9 @@ namespace DeadManSwitch.Internal
 
     public class DeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
     {
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly IDeadManSwitchLoggerFactory _loggerFactory;
 
-        public DeadManSwitchSessionFactory(ILoggerFactory loggerFactory)
+        public DeadManSwitchSessionFactory(IDeadManSwitchLoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
         }

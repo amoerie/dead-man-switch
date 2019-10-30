@@ -2,7 +2,10 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using DeadManSwitch.AspNetCore.DependencyInjection;
+using DeadManSwitch.AspNetCore.Logging;
 using DeadManSwitch.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Examples
@@ -14,11 +17,12 @@ namespace DeadManSwitch.Examples
         /// </summary>
         public async Task Main()
         {
-            var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
-            var runner = new DeadManSwitchRunner(
-                loggerFactory.CreateLogger<DeadManSwitchRunner>(),
-                new DeadManSwitchSessionFactory(loggerFactory)
-            );
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(builder => builder.AddConsole())
+                .AddDeadManSwitch()
+                .BuildServiceProvider();
+            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
+            
             var worker = new ExampleWorker();
 
             using (var cancellationTokenSource = new CancellationTokenSource())
