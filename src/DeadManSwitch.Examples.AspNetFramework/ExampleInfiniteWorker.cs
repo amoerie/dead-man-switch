@@ -2,19 +2,21 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DeadManSwitch.Examples.AspNetCore
+namespace DeadManSwitch.Examples.AspNetFramework
 {
-    public class ExampleWorker : IDeadManSwitchWorker<double>
+    public class ExampleInfiniteWorker : IInfiniteDeadManSwitchWorker
     {
         // for diagnostic purposes
         public string Name => "Example one time worker";
-        
-        public async Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
-        {
-            if (deadManSwitch == null)
-                throw new ArgumentNullException(nameof(deadManSwitch));
 
-            await deadManSwitch.NotifyAsync("Beginning work", cancellationToken).ConfigureAwait(false);
+        public async Task WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
+        {
+            if (deadManSwitch is null)
+            {
+                throw new ArgumentNullException(nameof(deadManSwitch));
+            }
+
+            await deadManSwitch.NotifyAsync("Beginning work again", cancellationToken).ConfigureAwait(false);
 
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
@@ -24,13 +26,10 @@ namespace DeadManSwitch.Examples.AspNetCore
 
             // tell the dead man's switch to stop the clock
             await deadManSwitch.SuspendAsync(cancellationToken).ConfigureAwait(false);
-
             await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
 
             // tell the dead man's switch to resume the clock
             await deadManSwitch.ResumeAsync(cancellationToken).ConfigureAwait(false);
-
-            return Math.PI;
         }
 
         private async Task DoSomethingUseful(CancellationToken cancellationToken)

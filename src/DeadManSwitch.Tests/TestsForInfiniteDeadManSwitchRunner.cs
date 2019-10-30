@@ -25,7 +25,8 @@ namespace DeadManSwitch.Tests
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
-                .WriteTo.TestOutput(testOutputHelper, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
+                .WriteTo.TestOutput(testOutputHelper,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
             var deadManSwitchLoggerFactory = new DeadManSwitchLoggerFactory(_loggerFactory);
@@ -70,14 +71,21 @@ namespace DeadManSwitch.Tests
                 // Arrange
                 List<double> pies = new List<double>();
                 var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var workItems = WorkItems(
-                    Work(Do(_ => pies.Add(Math.PI))),
-                    Work(Do(_ => pies.Add(Math.PI))),
-                    Work(Do(_ => pies.Add(Math.PI))),
-                    Do(_ => _logger.LogInformation("Cancelling infinite worker")),
-                    Work(Do(_ => cts.Cancel()))
-                );
-                var worker = Worker(workItems);
+                var worker = Worker(
+                    WorkItems(
+                        Work(
+                            Do(_ => pies.Add(Math.PI))
+                        ),
+                        Work(
+                            Do(_ => pies.Add(Math.PI))),
+                        Work(
+                            Do(_ => pies.Add(Math.PI))
+                        ),
+                        Work(
+                            Do(_ => _logger.LogInformation("Cancelling infinite worker")),
+                            Do(_ => cts.Cancel())
+                        )
+                    ));
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);

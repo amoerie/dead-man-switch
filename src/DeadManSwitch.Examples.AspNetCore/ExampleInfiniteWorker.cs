@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DeadManSwitch.Examples
+namespace DeadManSwitch.Examples.AspNetCore
 {
     public class ExampleInfiniteWorker : IInfiniteDeadManSwitchWorker
     {

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DeadManSwitch.AspNetCore.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using DeadManSwitch.Examples.AspNetFramework.Logging;
 
-namespace DeadManSwitch.Examples.AspNetCore
+namespace DeadManSwitch.Examples.AspNetFramework
 {
     public static class ExampleInfiniteProgram
     {
@@ -14,12 +12,10 @@ namespace DeadManSwitch.Examples.AspNetCore
         /// </summary>
         public static async Task Main()
         {
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole())
-                .AddDeadManSwitch()
-                .BuildServiceProvider();
-
-            var infiniteRunner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
+            // This example uses NLog, but it only requires a trivial amount of code to use any other logging library
+            var loggerFactory = new NLoggerFactory();
+            
+            var infiniteRunner = InfiniteDeadManSwitchRunner.Create(loggerFactory);
             var worker = new ExampleInfiniteWorker();
 
             using (var cancellationTokenSource = new CancellationTokenSource())

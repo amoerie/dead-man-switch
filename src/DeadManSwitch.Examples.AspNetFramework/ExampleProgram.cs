@@ -2,11 +2,9 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using DeadManSwitch.AspNetCore.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using DeadManSwitch.Examples.AspNetFramework.Logging;
 
-namespace DeadManSwitch.Examples.AspNetCore
+namespace DeadManSwitch.Examples.AspNetFramework
 {
     public static class ExampleProgram
     {
@@ -15,11 +13,8 @@ namespace DeadManSwitch.Examples.AspNetCore
         /// </summary>
         public static async Task Main()
         {
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole())
-                .AddDeadManSwitch()
-                .BuildServiceProvider();
-            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
+            var loggerFactory = new NLoggerFactory();
+            var runner = DeadManSwitchRunner.Create(loggerFactory);
 
             var worker = new ExampleWorker();
 

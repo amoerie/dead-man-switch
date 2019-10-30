@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DeadManSwitch.Examples.AspNetCore
+namespace DeadManSwitch.Examples.AspNetFramework
 {
     public class ExampleWorker : IDeadManSwitchWorker<double>
     {
