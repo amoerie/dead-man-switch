@@ -8,8 +8,8 @@
         <PackageProjectUrl>https://github.com/amoerie/dead-man-switch</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amoerie/dead-man-switch</RepositoryUrl>
         <RepositoryType>GIT</RepositoryType>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <FileVersion>1.0.0</FileVersion>
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <FileVersion>0.1.0</FileVersion>
         <DocumentationFile>bin\$(Configuration)\DeadManSwitch.xml</DocumentationFile>
         <RootNamespace>DeadManSwitch</RootNamespace>
         <PackageVersion>0.1.0</PackageVersion>
@@ -17,6 +17,7 @@
         <Copyright>MIT</Copyright>
         <PackageIconUrl>https://raw.githubusercontent.com/amoerie/dead-man-switch/master/logo.png</PackageIconUrl>
         <PackageTags>tasks, cancellation, workers</PackageTags>
+        <PackageReleaseNotes>See https://github.com/amoerie/dead-man-switch/blob/master/CHANGELOG.MD</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

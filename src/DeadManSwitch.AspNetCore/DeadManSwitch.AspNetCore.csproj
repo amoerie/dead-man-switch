@@ -2,6 +2,22 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>7.3</LangVersion>
+        <Title>Dead Man's Switch ASP.NET Core integration</Title>
+        <Authors>Alexander Moerman</Authors>
+        <PackageProjectUrl>https://github.com/amoerie/dead-man-switch</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/amoerie/dead-man-switch</RepositoryUrl>
+        <RepositoryType>GIT</RepositoryType>
+        <AssemblyVersion>0.1.0</AssemblyVersion>
+        <FileVersion>0.1.0</FileVersion>
+        <DocumentationFile>bin\$(Configuration)\DeadManSwitch.AspNetCore.xml</DocumentationFile>
+        <RootNamespace>DeadManSwitch.AspNetCore</RootNamespace>
+        <PackageVersion>0.1.0</PackageVersion>
+        <Description>Integration with ASP.NET core logging and dependency injection for the dead man's switch</Description>
+        <Copyright>MIT</Copyright>
+        <PackageIconUrl>https://raw.githubusercontent.com/amoerie/dead-man-switch/master/logo.png</PackageIconUrl>
+        <PackageTags>tasks, cancellation, workers</PackageTags>
+        <PackageReleaseNotes>See https://github.com/amoerie/dead-man-switch/blob/master/CHANGELOG.MD</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>

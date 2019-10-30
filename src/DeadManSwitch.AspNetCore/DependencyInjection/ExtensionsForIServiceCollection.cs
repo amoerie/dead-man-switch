@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DeadManSwitch.AspNetCore.DependencyInjection
 {
+    /// <summary>
+    /// Provides extensions for <see cref="IServiceCollection"/>
+    /// </summary>
     public static class ExtensionsForIServiceCollection
     {
         /// <summary>
