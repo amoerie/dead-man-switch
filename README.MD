@@ -12,6 +12,13 @@ According to Wikipedia, a [**dead man's switch**](https://en.wikipedia.org/wiki/
 
 In .NET, a dead man's switch is designed to detect a worker task that is no longer making progress and cancel it. It does this by cancelling a [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken) that is provided to the worker from the start. In turn, the process is responsible for notifying the dead man's switch in a periodic fashion to prevent its own cancellation.
 
+This library is intended to easily implement long running worker tasks that may or may not freeze/stop making progress somewhere along the way. When that happens, the dead man's switch will trigger after a preconfigured timeout and automatically try to cancel the worker using the provided cancellation token. 
+
+There are two types of workers you can implement:
+
+- IDeadManSwitchWorker<TResult> = this interface indicates you want to run an async Task exactly once, and it produces a TResult
+- IInfiniteDeadManSwitchWorker  = this interface indicates you want to infinitely repeat an async Task
+
 # Example
 
 ```csharp
