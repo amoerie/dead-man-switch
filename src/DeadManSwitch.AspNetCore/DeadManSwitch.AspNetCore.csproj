@@ -15,7 +15,7 @@
         <PackageVersion>0.1.0</PackageVersion>
         <Description>Integration with ASP.NET core logging and dependency injection for the dead man's switch</Description>
         <Copyright>MIT</Copyright>
-        <PackageIconUrl>https://raw.githubusercontent.com/amoerie/dead-man-switch/master/logo.png</PackageIconUrl>
+        <PackageIcon>icon.png</PackageIcon>
         <PackageTags>tasks, cancellation, workers</PackageTags>
         <PackageReleaseNotes>See https://github.com/amoerie/dead-man-switch/blob/master/CHANGELOG.MD</PackageReleaseNotes>
     </PropertyGroup>
@@ -27,6 +27,10 @@
     <ItemGroup>
       <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj" />
       <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="../../icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 </Project>
