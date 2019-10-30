@@ -12,6 +12,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
+    - name: Restore NuGet packages
+      run: nuget restore ./src/DeadManSwitch.sln
     - name: Build with dotnet
       run: dotnet build ./src/DeadManSwitch.sln --configuration Release
     - name: Test with dotnet
