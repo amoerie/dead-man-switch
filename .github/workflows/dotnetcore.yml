@@ -43,5 +43,5 @@ jobs:
     - name: Build with dotnet
       run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
     - name: Test with dotnet
-      run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release Release --framework netcoreapp2.1
+      run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
 
