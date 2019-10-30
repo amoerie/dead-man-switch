@@ -29,7 +29,7 @@ jobs:
     - name: Build with dotnet
       run: dotnet build ./src/DeadManSwitch.sln --configuration Release
     - name: Test with dotnet
-      run: dotnet test ./src/DeadManSwitch.sln --configuration Release
+      run: dotnet test ./src/DeadManSwitch.sln --configuration Release --framework netcoreapp2.1
       
   build_macOS:
     runs-on: macOS-latest
@@ -43,5 +43,5 @@ jobs:
     - name: Build with dotnet
       run: dotnet build ./src/DeadManSwitch.sln --configuration Release
     - name: Test with dotnet
-      run: dotnet test ./src/DeadManSwitch.sln --configuration Release
+      run: dotnet test ./src/DeadManSwitch.sln --configuration Release --framework netcoreapp2.1
 
