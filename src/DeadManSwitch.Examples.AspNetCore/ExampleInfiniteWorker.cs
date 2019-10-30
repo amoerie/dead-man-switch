@@ -26,20 +26,20 @@ namespace DeadManSwitch.Examples
 
             // tell the dead man's switch to stop the clock
             await deadManSwitch.SuspendAsync(cancellationToken).ConfigureAwait(false);
-            await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelled().ConfigureAwait(false);
+            await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
 
             // tell the dead man's switch to resume the clock
             await deadManSwitch.ResumeAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        private Task DoSomethingUseful(CancellationToken cancellationToken)
+        private async Task DoSomethingUseful(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await Task.Delay(100, cancellationToken).ConfigureAwait(false);
         }
 
-        private Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelled()
+        private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await Task.Delay(100000, cancellationToken).ConfigureAwait(false);
         }
     }
 }

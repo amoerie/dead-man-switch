@@ -20,7 +20,7 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="deadManSwitch">The dead man's switch that should be notified every x seconds.</param>
         /// <param name="cancellationToken">The cancellation token that will be marked as cancelled when the dead man's switch is not notified in a timely fashion</param>
-        /// <returns><see cref="TResult"/></returns>
+        /// <returns><typeparamref name="TResult"/></returns>
         Task<TResult> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken);
     }
 }

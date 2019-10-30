@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DeadManSwitch.Internal
 {
-    public interface IDeadManSwitchContext : IDisposable
+    internal interface IDeadManSwitchContext : IDisposable
     {
         CancellationTokenSource CancellationTokenSource { get; set; }
 
@@ -17,7 +17,7 @@ namespace DeadManSwitch.Internal
         ValueTask<IEnumerable<DeadManSwitchNotification>> GetNotificationsAsync(CancellationToken cancellationToken);
     }
     
-    public sealed class DeadManSwitchContext : IDeadManSwitchContext
+    internal sealed class DeadManSwitchContext : IDeadManSwitchContext
     {
         private readonly int _numberOfNotificationsToKeep;
         private readonly ChannelWriter<DeadManSwitchNotification> _notificationsWriter;

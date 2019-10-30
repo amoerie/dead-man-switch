@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using DeadManSwitch.Internal;
@@ -40,6 +41,7 @@ namespace DeadManSwitch
     }
 
     /// <inheritdoc />
+    [SuppressMessage("Naming", "CA1724", Justification = "This project is named after this class")]
     public sealed class DeadManSwitch : IDeadManSwitch
     {
         private readonly IDeadManSwitchContext _context;
@@ -50,7 +52,7 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="context"></param>
         /// <param name="logger"></param>
-        public DeadManSwitch(IDeadManSwitchContext context, IDeadManSwitchLogger<DeadManSwitch> logger)
+        internal DeadManSwitch(IDeadManSwitchContext context, IDeadManSwitchLogger<DeadManSwitch> logger)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

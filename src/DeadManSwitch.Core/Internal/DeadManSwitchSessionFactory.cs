@@ -2,12 +2,12 @@
 
 namespace DeadManSwitch.Internal
 {
-    public interface IDeadManSwitchSessionFactory
+    internal interface IDeadManSwitchSessionFactory
     {
         IDeadManSwitchSession Create(DeadManSwitchOptions deadManSwitchOptions);
     }
 
-    public class DeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
+    internal class DeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
     {
         private readonly IDeadManSwitchLoggerFactory _loggerFactory;
 

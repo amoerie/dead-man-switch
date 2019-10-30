@@ -6,12 +6,12 @@ using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
 {
-    public interface IDeadManSwitchTriggerer
+    internal interface IDeadManSwitchTriggerer
     {
         ValueTask TriggerAsync(CancellationToken cancellationToken);
     }
 
-    public sealed class DeadManSwitchTriggerer : IDeadManSwitchTriggerer
+    internal sealed class DeadManSwitchTriggerer : IDeadManSwitchTriggerer
     {
         private readonly IDeadManSwitchContext _deadManSwitchContext;
         private readonly DeadManSwitchOptions _deadManSwitchOptions;

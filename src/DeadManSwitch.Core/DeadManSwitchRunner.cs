@@ -34,13 +34,26 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="logger">The logger that will be used for diagnostic log messages</param>
         /// <param name="deadManSwitchSessionFactory">The session factory that is capable of starting a new dead man's switch session</param>
-        public DeadManSwitchRunner(IDeadManSwitchLogger<DeadManSwitchRunner> logger,
+        internal DeadManSwitchRunner(IDeadManSwitchLogger<DeadManSwitchRunner> logger,
             IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
         {
             _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Creates a new <see cref="IDeadManSwitchRunner"/> that is capable of running <see cref="IDeadManSwitchWorker{TResult}"/>
+        /// </summary>
+        /// <param name="loggerFactory">The factory that is capable of creating loggers</param>
+        /// <returns>A new <see cref="IDeadManSwitchRunner"/> that is capable of running <see cref="IDeadManSwitchWorker{TResult}"/></returns>
+        public static IDeadManSwitchRunner Create(IDeadManSwitchLoggerFactory loggerFactory)
+        {
+            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
+            return new DeadManSwitchRunner(
+                loggerFactory.CreateLogger<DeadManSwitchRunner>(),
+                new DeadManSwitchSessionFactory(loggerFactory));
+        }
+        
         /// <inheritdoc />
         public async Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> worker, DeadManSwitchOptions options,
             CancellationToken cancellationToken)

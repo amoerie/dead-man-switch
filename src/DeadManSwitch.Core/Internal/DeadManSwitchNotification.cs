@@ -2,7 +2,7 @@
 
 namespace DeadManSwitch.Internal
 {
-    public class DeadManSwitchNotification
+    internal class DeadManSwitchNotification
     {
         /// <summary>
         /// The date and time when the notification occurred

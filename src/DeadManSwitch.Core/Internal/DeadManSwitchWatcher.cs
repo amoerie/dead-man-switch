@@ -5,12 +5,12 @@ using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
 {
-    public interface IDeadManSwitchWatcher
+    internal interface IDeadManSwitchWatcher
     {
         ValueTask WatchAsync(CancellationToken cancellationToken);
     }
 
-    public sealed class DeadManSwitchWatcher : IDeadManSwitchWatcher
+    internal sealed class DeadManSwitchWatcher : IDeadManSwitchWatcher
     {
         private readonly IDeadManSwitchContext _context;
         private readonly DeadManSwitchOptions _options;

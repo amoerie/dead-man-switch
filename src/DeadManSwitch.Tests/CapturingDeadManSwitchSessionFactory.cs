@@ -3,7 +3,7 @@ using DeadManSwitch.Internal;
 
 namespace DeadManSwitch.Tests
 {
-    public class CapturingDeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
+    internal class CapturingDeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
     {
         private readonly IDeadManSwitchSessionFactory _inner;
         

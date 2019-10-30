@@ -33,11 +33,22 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="logger">The logger that will be used for diagnostic log messages</param>
         /// <param name="deadManSwitchSessionFactory">The session factory that is capable of starting a new dead man's switch session</param>
-        public InfiniteDeadManSwitchRunner(IDeadManSwitchLogger<InfiniteDeadManSwitchRunner> logger,
+        internal InfiniteDeadManSwitchRunner(IDeadManSwitchLogger<InfiniteDeadManSwitchRunner> logger,
             IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
         {
             _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+        
+        /// <summary>
+        /// Creates a new <see cref="IInfiniteDeadManSwitchRunner"/> that is capable of running <see cref="IInfiniteDeadManSwitchRunner"/>
+        /// </summary>
+        /// <param name="loggerFactory">The factory that is capable of creating loggers</param>
+        /// <returns>A new <see cref="IInfiniteDeadManSwitchRunner"/> that is capable of running <see cref="IInfiniteDeadManSwitchWorker"/></returns>
+        public static IInfiniteDeadManSwitchRunner Create(IDeadManSwitchLoggerFactory loggerFactory)
+        {
+            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
+            return new InfiniteDeadManSwitchRunner(loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(),new DeadManSwitchSessionFactory(loggerFactory));
         }
 
         /// <inheritdoc />
