@@ -65,4 +65,5 @@ See the examples projects for a sample program that notifies the dead man's swit
 
 # NuGet
 
-Coming soon
+- [DeadManSwitch](https://www.nuget.org/packages/DeadManSwitch/)
+- [DeadManSwitch.AspNetCore](https://www.nuget.org/packages/DeadManSwitch.AspNetCore/)
