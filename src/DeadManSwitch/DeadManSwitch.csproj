@@ -15,6 +15,8 @@
         <PackageVersion>0.1.0</PackageVersion>
         <Description>A dead man's switch is designed to detect a worker task that is no longer making progress and cancel it. It does this by cancelling a CancellationToken that is provided to the worker from the start. In turn, the process is responsible for notifying the dead man's switch in a periodic fashion to prevent its own cancellation.</Description>
         <Copyright>MIT</Copyright>
+        <PackageIconUrl>https://raw.githubusercontent.com/amoerie/dead-man-switch/master/logo.png</PackageIconUrl>
+        <PackageTags>tasks, cancellation, workers</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
