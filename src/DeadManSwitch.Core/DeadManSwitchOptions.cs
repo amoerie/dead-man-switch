@@ -2,6 +2,9 @@
 
 namespace DeadManSwitch
 {
+    /// <summary>
+    /// The options that modify the behavior of the dead man's switch
+    /// </summary>
     public class DeadManSwitchOptions
     {
         /// <summary>

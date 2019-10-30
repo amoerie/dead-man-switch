@@ -10,7 +10,7 @@ namespace DeadManSwitch
     public interface IDeadManSwitchWorker<TResult>
     {
         /// <summary>
-        /// The name of this worker
+        /// The name of this worker, for diagnostic purposes
         /// </summary>
         string Name { get; }
 

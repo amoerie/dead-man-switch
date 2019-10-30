@@ -6,16 +6,33 @@ using DeadManSwitch.Logging;
 
 namespace DeadManSwitch
 {
+    /// <summary>
+    /// The entry point to keep running a dead man's switch worker infinitely.  
+    /// </summary>
     public interface IInfiniteDeadManSwitchRunner
     {
+        /// <summary>
+        /// Starts the specified <paramref name="worker"/>, to which it will pass a <see cref="IDeadManSwitch"/> and a cancellation token.
+        /// </summary>
+        /// <param name="worker">The worker that can perform work asynchronously</param>
+        /// <param name="options">The options that specify how the dead man's switch must behave</param>
+        /// <param name="cancellationToken">The cancellation token that is capable of immediately stopping the dead man's switch and the worker.</param>
+        /// <returns>A task that will complete when the provided <paramref name="cancellationToken"/> is cancelled.</returns>
+        /// <exception cref="Exception">When the worker throws an exception, this will not be caught</exception>
         Task RunAsync(IInfiniteDeadManSwitchWorker worker, DeadManSwitchOptions options, CancellationToken cancellationToken);
     }
 
+    /// <inheritdoc />
     public class InfiniteDeadManSwitchRunner : IInfiniteDeadManSwitchRunner
     {
         private readonly IDeadManSwitchSessionFactory _deadManSwitchSessionFactory;
         private readonly IDeadManSwitchLogger<InfiniteDeadManSwitchRunner> _logger;
 
+        /// <summary>
+        /// Creates a new instance of a <see cref="InfiniteDeadManSwitchRunner"/>
+        /// </summary>
+        /// <param name="logger">The logger that will be used for diagnostic log messages</param>
+        /// <param name="deadManSwitchSessionFactory">The session factory that is capable of starting a new dead man's switch session</param>
         public InfiniteDeadManSwitchRunner(IDeadManSwitchLogger<InfiniteDeadManSwitchRunner> logger,
             IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
         {
@@ -23,6 +40,7 @@ namespace DeadManSwitch
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc />
         public async Task RunAsync(IInfiniteDeadManSwitchWorker worker, DeadManSwitchOptions options, CancellationToken cancellationToken)
         {
             if (worker == null) throw new ArgumentNullException(nameof(worker));
