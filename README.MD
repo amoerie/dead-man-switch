@@ -1,6 +1,6 @@
 # 💀 The Dead Man's Switch
 
-[![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/build/badge.svg)](https://github.com/amoerie/dead-man-switch/actions) ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch?label=DeadManSwitch) ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch.AspNetCore?label=DeadManSwitch.AspNetCore)
+[![Actions Status](https://github.com/amoerie/dead-man-switch/workflows/build/badge.svg)](https://github.com/amoerie/dead-man-switch/actions) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch?label=DeadManSwitch)](https://www.nuget.org/packages/DeadManSwitch) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch.AspNetCore?label=DeadManSwitch.AspNetCore)](https://www.nuget.org/packages/DeadManSwitch.AspNetCore)
 
 
 According to Wikipedia, a [**dead man's switch**](https://en.wikipedia.org/wiki/Dead_man%27s_switch) is
