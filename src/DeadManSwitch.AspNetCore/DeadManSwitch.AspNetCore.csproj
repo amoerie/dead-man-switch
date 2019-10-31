@@ -8,11 +8,11 @@
         <PackageProjectUrl>https://github.com/amoerie/dead-man-switch</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amoerie/dead-man-switch</RepositoryUrl>
         <RepositoryType>GIT</RepositoryType>
-        <AssemblyVersion>0.1.0</AssemblyVersion>
-        <FileVersion>0.1.0</FileVersion>
+        <AssemblyVersion>0.1.1</AssemblyVersion>
+        <FileVersion>0.1.1</FileVersion>
         <DocumentationFile>bin\$(Configuration)\DeadManSwitch.AspNetCore.xml</DocumentationFile>
         <RootNamespace>DeadManSwitch.AspNetCore</RootNamespace>
-        <PackageVersion>0.1.0</PackageVersion>
+        <PackageVersion>0.1.1</PackageVersion>
         <Description>Integration with ASP.NET core logging and dependency injection for the dead man's switch</Description>
         <Copyright>MIT</Copyright>
         <PackageIcon>icon.png</PackageIcon>
@@ -22,6 +22,10 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
+          <DevelopmentDependency>true</DevelopmentDependency>
+          <PrivateAssets>All</PrivateAssets>
+      </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
