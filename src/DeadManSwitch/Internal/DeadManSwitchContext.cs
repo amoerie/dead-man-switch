@@ -8,70 +8,91 @@ namespace DeadManSwitch.Internal
 {
     internal interface IDeadManSwitchContext : IDisposable
     {
+        bool IsSuspended { get; }
+        long LastNotifiedTicks { get; }
+
         CancellationTokenSource CancellationTokenSource { get; set; }
 
-        ValueTask EnqueueStatusAsync(DeadManSwitchStatus deadManSwitchStatus, CancellationToken cancellationToken);
-        ValueTask<DeadManSwitchStatus> DequeueStatusAsync(CancellationToken cancellationToken);
+        void Suspend();
+        void Resume();
 
-        ValueTask AddNotificationAsync(DeadManSwitchNotification deadManSwitchNotification, CancellationToken cancellationToken);
-        ValueTask<IEnumerable<DeadManSwitchNotification>> GetNotificationsAsync(CancellationToken cancellationToken);
+        void AddNotification(DeadManSwitchNotification deadManSwitchNotification);
+        IReadOnlyList<DeadManSwitchNotification> GetNotifications();
     }
     
     internal sealed class DeadManSwitchContext : IDeadManSwitchContext
     {
-        private readonly int _numberOfNotificationsToKeep;
-        private readonly ChannelWriter<DeadManSwitchNotification> _notificationsWriter;
-        private readonly ChannelReader<DeadManSwitchNotification> _notificationsReader;
-        private readonly ChannelReader<DeadManSwitchStatus> _statusesReader;
-        private readonly ChannelWriter<DeadManSwitchStatus> _statusesWriter;
+        public bool IsSuspended => _isSuspended;
+        public long LastNotifiedTicks => Interlocked.Read(ref _lastNotifiedTicks);
+        public CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
+
+
+        private readonly object _notificationsSyncRoot = new object();
+        private volatile DeadManSwitchNotification[] _notifications;
+
+        private volatile int _notificationsStartIndex = 0;
+
+        private volatile bool _isSuspended;
+        private long _lastNotifiedTicks = DateTimeOffset.UtcNow.UtcTicks;
+
 
         public DeadManSwitchContext(DeadManSwitchOptions deadManSwitchOptions)
         {
             if (deadManSwitchOptions == null) throw new ArgumentNullException(nameof(deadManSwitchOptions));
-            
-            var notifications = Channel.CreateBounded<DeadManSwitchNotification>(new BoundedChannelOptions(deadManSwitchOptions.NumberOfNotificationsToKeep)
+
+            _notifications = new DeadManSwitchNotification[deadManSwitchOptions.NumberOfNotificationsToKeep];
+        }
+
+
+        public void Suspend()
+        {
+            _isSuspended = true;
+        }
+
+        public void Resume()
+        {
+            _isSuspended = false;
+        }
+
+        public void AddNotification(DeadManSwitchNotification deadManSwitchNotification)
+        {
+            Interlocked.Exchange(ref _lastNotifiedTicks, DateTimeOffset.UtcNow.UtcTicks);
+
+            lock (_notificationsSyncRoot)
             {
-                SingleWriter = false,
-                SingleReader = true,
-                FullMode = BoundedChannelFullMode.DropOldest
-            });
-            var statuses = Channel.CreateUnbounded<DeadManSwitchStatus>(new UnboundedChannelOptions
-            {
-                SingleWriter = false,
-                SingleReader = true
-            });
-            _numberOfNotificationsToKeep = deadManSwitchOptions.NumberOfNotificationsToKeep;
-            _notificationsReader = notifications.Reader;
-            _notificationsWriter = notifications.Writer;
-            _statusesReader = statuses.Reader;
-            _statusesWriter = statuses.Writer;
-            
-            CancellationTokenSource = new CancellationTokenSource();
-        }
-
-        public CancellationTokenSource CancellationTokenSource { get; set; }
-
-        public ValueTask EnqueueStatusAsync(DeadManSwitchStatus deadManSwitchStatus, CancellationToken cancellationToken)
-        {
-            return _statusesWriter.WriteAsync(deadManSwitchStatus, cancellationToken);
-        }
-
-        public ValueTask<DeadManSwitchStatus> DequeueStatusAsync(CancellationToken cancellationToken)
-        {
-            return _statusesReader.ReadAsync(cancellationToken);
-        }
-
-        public ValueTask AddNotificationAsync(DeadManSwitchNotification deadManSwitchNotification, CancellationToken cancellationToken)
-        {
-            return _notificationsWriter.WriteAsync(deadManSwitchNotification, cancellationToken);
+                _notifications[_notificationsStartIndex] = deadManSwitchNotification;
+                _notificationsStartIndex = (_notificationsStartIndex + 1) % _notifications.Length;
+            }
         }
         
-        public ValueTask<IEnumerable<DeadManSwitchNotification>> GetNotificationsAsync(CancellationToken cancellationToken)
+        public IReadOnlyList<DeadManSwitchNotification> GetNotifications()
         {
-            var notifications = new List<DeadManSwitchNotification>(_numberOfNotificationsToKeep);
-            while (_notificationsReader.TryRead(out var notification))
-                notifications.Add(notification);
-            return new ValueTask<IEnumerable<DeadManSwitchNotification>>(notifications);
+            DeadManSwitchNotification[] oldNotifications;
+            int oldStartIndex;
+
+            lock (_notificationsSyncRoot)
+            {
+                oldNotifications = _notifications;
+                oldStartIndex = _notificationsStartIndex;
+
+                _notifications = new DeadManSwitchNotification[oldNotifications.Length];
+                _notificationsStartIndex = 0;
+            }
+
+
+            var notificationsList = new List<DeadManSwitchNotification>(oldNotifications.Length);
+
+            for (int x = 0; x < oldNotifications.Length; ++x)
+            {
+                var currentNotification = oldNotifications[(x + oldStartIndex) % oldNotifications.Length];
+
+                if (currentNotification == null)
+                    break;
+
+                notificationsList.Add(currentNotification);
+            }
+
+            return notificationsList;
         }
 
         public void Dispose()

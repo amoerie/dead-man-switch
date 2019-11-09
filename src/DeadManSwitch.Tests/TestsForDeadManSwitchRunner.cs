@@ -450,7 +450,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = await _sessionFactory.Session.DeadManSwitchContext.GetNotificationsAsync(cts.Token).ConfigureAwait(false);
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
                 string[] expected =
                 {
                     "Notification 2",
@@ -477,7 +477,7 @@ namespace DeadManSwitch.Tests
                             var sendNotifications = Enumerable.Range(0, numberOfNotifications)
                                 .AsParallel()
                                 .WithDegreeOfParallelism(100)
-                                .Select(i => deadManSwitch.NotifyAsync("Notification " + i, cancellationToken).AsTask());
+                                .Select(i => Task.Run(() => deadManSwitch.Notify("Notification " + i)));
                             await Task.WhenAll(sendNotifications).ConfigureAwait(false);
                         }
                     ),
@@ -490,7 +490,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = await _sessionFactory.Session.DeadManSwitchContext.GetNotificationsAsync(cts.Token).ConfigureAwait(false);
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
                 notifications.Should().HaveCount(3);
             }
         }
@@ -548,7 +548,7 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
         {
-            return async (deadManSwitch, cancellationToken) => { await deadManSwitch.NotifyAsync(notification, cancellationToken).ConfigureAwait(false); };
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification));
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
@@ -567,12 +567,12 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Pause()
         {
-            return (deadManSwitch, cancellationToken) => deadManSwitch.SuspendAsync(cancellationToken).AsTask();
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Suspend());
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Resume()
         {
-            return (deadManSwitch, cancellationToken) => deadManSwitch.ResumeAsync(cancellationToken).AsTask();
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume());
         }
 
         #endregion
