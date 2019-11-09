@@ -428,6 +428,41 @@ namespace DeadManSwitch.Tests
         }
 
         [Fact]
+        public async Task ShouldContainNotificationsEvenIfLessThanMaximumNumberWereQueued()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                // Arrange
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(5), NumberOfNotificationsToKeep = 10 };
+                var worker = Worker(
+                    Work(
+                        Notify("Notification 1"),
+                        Notify("Notification 2"),
+                        Notify("Notification 3"),
+                        Notify("Notification 4")
+                    ),
+                    Result(Math.PI)
+                );
+
+                // Act
+                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+
+                // Assert
+                result.Should().Be(Math.PI);
+                _sessionFactory.Session.Should().NotBeNull();
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
+                string[] expected =
+                {
+                    "Notification 1",
+                    "Notification 2",
+                    "Notification 3",
+                    "Notification 4"
+                };
+                string[] actual = notifications.Select(n => n.Content).ToArray();
+                actual.Should().BeEquivalentTo(expected);
+            }
+        }
+        [Fact]
         public async Task ShouldContainNotificationsRespectingNumberOfNotificationsToKeep()
         {
             using (var cts = new CancellationTokenSource())

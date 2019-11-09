@@ -40,12 +40,11 @@ namespace DeadManSwitch.Internal
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                // TODO: IsSuspended
                 TimeSpan timeSinceLastNotification;
 
                 if (!_context.IsSuspended)
                 {
-                    timeSinceLastNotification = TimeSpan.FromTicks(DateTimeOffset.UtcNow.UtcTicks - _context.LastNotifiedTicks); ;
+                    timeSinceLastNotification = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - _context.LastNotifiedTicks); ;
 
                     if (timeSinceLastNotification > _options.Timeout)
                     {
