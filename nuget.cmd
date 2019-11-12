@@ -1,1 +1,0 @@
-dotnet pack ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release --include-source
