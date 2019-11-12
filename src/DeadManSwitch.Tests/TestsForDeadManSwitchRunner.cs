@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DeadManSwitch.AspNetCore.Logging;
 using DeadManSwitch.Internal;
+using DeadManSwitch.Tests.Logging;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -29,10 +29,10 @@ namespace DeadManSwitch.Tests
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
-            var deadManSwitchLoggerFactory = new DeadManSwitchLoggerFactory(_loggerFactory);
+            var loggerFactory = new TestLoggerFactory(_loggerFactory);
             _logger = _loggerFactory.CreateLogger<TestsForDeadManSwitchRunner>();
-            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(deadManSwitchLoggerFactory));
-            _runner = new DeadManSwitchRunner(deadManSwitchLoggerFactory.CreateLogger<DeadManSwitchRunner>(), _sessionFactory);
+            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(loggerFactory));
+            _runner = new DeadManSwitchRunner(loggerFactory.CreateLogger<DeadManSwitchRunner>(), _sessionFactory);
         }
 
         public void Dispose()
@@ -428,6 +428,41 @@ namespace DeadManSwitch.Tests
         }
 
         [Fact]
+        public async Task ShouldContainNotificationsEvenIfLessThanMaximumNumberWereQueued()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                // Arrange
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(5), NumberOfNotificationsToKeep = 10 };
+                var worker = Worker(
+                    Work(
+                        Notify("Notification 1"),
+                        Notify("Notification 2"),
+                        Notify("Notification 3"),
+                        Notify("Notification 4")
+                    ),
+                    Result(Math.PI)
+                );
+
+                // Act
+                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+
+                // Assert
+                result.Should().Be(Math.PI);
+                _sessionFactory.Session.Should().NotBeNull();
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
+                string[] expected =
+                {
+                    "Notification 1",
+                    "Notification 2",
+                    "Notification 3",
+                    "Notification 4"
+                };
+                string[] actual = notifications.Select(n => n.Content).ToArray();
+                actual.Should().BeEquivalentTo(expected);
+            }
+        }
+        [Fact]
         public async Task ShouldContainNotificationsRespectingNumberOfNotificationsToKeep()
         {
             using (var cts = new CancellationTokenSource())
@@ -450,7 +485,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = await _sessionFactory.Session.DeadManSwitchContext.GetNotificationsAsync(cts.Token).ConfigureAwait(false);
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
                 string[] expected =
                 {
                     "Notification 2",
@@ -477,7 +512,7 @@ namespace DeadManSwitch.Tests
                             var sendNotifications = Enumerable.Range(0, numberOfNotifications)
                                 .AsParallel()
                                 .WithDegreeOfParallelism(100)
-                                .Select(i => deadManSwitch.NotifyAsync("Notification " + i, cancellationToken).AsTask());
+                                .Select(i => Task.Run(() => deadManSwitch.Notify("Notification " + i)));
                             await Task.WhenAll(sendNotifications).ConfigureAwait(false);
                         }
                     ),
@@ -490,7 +525,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = await _sessionFactory.Session.DeadManSwitchContext.GetNotificationsAsync(cts.Token).ConfigureAwait(false);
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
                 notifications.Should().HaveCount(3);
             }
         }
@@ -548,7 +583,7 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
         {
-            return async (deadManSwitch, cancellationToken) => { await deadManSwitch.NotifyAsync(notification, cancellationToken).ConfigureAwait(false); };
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification));
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
@@ -567,12 +602,12 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Pause()
         {
-            return (deadManSwitch, cancellationToken) => deadManSwitch.SuspendAsync(cancellationToken).AsTask();
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Suspend());
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Resume()
         {
-            return (deadManSwitch, cancellationToken) => deadManSwitch.ResumeAsync(cancellationToken).AsTask();
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume());
         }
 
         #endregion

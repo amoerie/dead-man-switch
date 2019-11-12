@@ -16,20 +16,20 @@ namespace DeadManSwitch.Examples.AspNetCore
                 throw new ArgumentNullException(nameof(deadManSwitch));
             }
 
-            await deadManSwitch.NotifyAsync("Beginning work again", cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Notify("Beginning work again");
 
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
-            await deadManSwitch.NotifyAsync("Still busy, please don't cancel", cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Notify("Still busy, please don't cancel");
 
             await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
 
             // tell the dead man's switch to stop the clock
-            await deadManSwitch.SuspendAsync(cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Suspend();
             await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
 
             // tell the dead man's switch to resume the clock
-            await deadManSwitch.ResumeAsync(cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Resume();
         }
 
         private async Task DoSomethingUseful(CancellationToken cancellationToken)

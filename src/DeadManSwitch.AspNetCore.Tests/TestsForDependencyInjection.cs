@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Xunit;
 
-namespace DeadManSwitch.Tests
+namespace DeadManSwitch.AspNetCore.Tests
 {
     public class TestsForDependencyInjection
     {
@@ -50,7 +50,7 @@ namespace DeadManSwitch.Tests
             var serviceProvider = new ServiceCollection()
                 .AddLogging(b => b.AddSerilog())
                 .AddDeadManSwitch()
-                .BuildServiceProvider();
+                .BuildServiceProvider(); 
 
             // Act
             var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();

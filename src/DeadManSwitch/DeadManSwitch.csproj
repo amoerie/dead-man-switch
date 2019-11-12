@@ -8,28 +8,28 @@
         <PackageProjectUrl>https://github.com/amoerie/dead-man-switch</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amoerie/dead-man-switch</RepositoryUrl>
         <RepositoryType>GIT</RepositoryType>
-        <AssemblyVersion>0.1.1</AssemblyVersion>
-        <FileVersion>0.1.1</FileVersion>
+        <AssemblyVersion>0.2.1</AssemblyVersion>
+        <FileVersion>0.2.1</FileVersion>
+        <PackageVersion>0.2.1</PackageVersion>
         <DocumentationFile>bin\$(Configuration)\DeadManSwitch.xml</DocumentationFile>
         <RootNamespace>DeadManSwitch</RootNamespace>
-        <PackageVersion>0.1.1</PackageVersion>
         <Description>A dead man's switch is designed to detect a worker task that is no longer making progress and cancel it. It does this by cancelling a CancellationToken that is provided to the worker from the start. In turn, the process is responsible for notifying the dead man's switch in a periodic fashion to prevent its own cancellation.</Description>
         <Copyright>MIT</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
         <PackageTags>tasks, cancellation, workers</PackageTags>
         <PackageReleaseNotes>See https://github.com/amoerie/dead-man-switch/blob/master/CHANGELOG.MD</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6"  >
+      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
           <DevelopmentDependency>true</DevelopmentDependency>
           <PrivateAssets>All</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="System.Threading.Channels" Version="4.6.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="../../icon.png" Pack="true" PackagePath="\"/>
+        <None Include="../../icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>

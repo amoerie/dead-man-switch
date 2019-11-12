@@ -8,7 +8,7 @@ namespace DeadManSwitch.Internal
 {
     internal interface IDeadManSwitchTriggerer
     {
-        ValueTask TriggerAsync(CancellationToken cancellationToken);
+        void Trigger();
     }
 
     internal sealed class DeadManSwitchTriggerer : IDeadManSwitchTriggerer
@@ -24,12 +24,12 @@ namespace DeadManSwitch.Internal
             _logger = logger;
         }
 
-        public async ValueTask TriggerAsync(CancellationToken cancellationToken)
+        public void Trigger()
         {
             _logger.Warning("The worker task did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
                             "and will be cancelled.", _deadManSwitchOptions.Timeout.TotalSeconds);
 
-            var notifications = (await _deadManSwitchContext.GetNotificationsAsync(cancellationToken).ConfigureAwait(false)).ToList();
+            var notifications = _deadManSwitchContext.GetNotifications();
 
             _logger.Warning("These were the last {NotificationCount} notifications: ", notifications.Count);
 

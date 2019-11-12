@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DeadManSwitch.AspNetCore.Logging;
 using DeadManSwitch.Internal;
+using DeadManSwitch.Tests.Logging;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -29,10 +29,10 @@ namespace DeadManSwitch.Tests
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
-            var deadManSwitchLoggerFactory = new DeadManSwitchLoggerFactory(_loggerFactory);
+            var loggerFactory = new TestLoggerFactory(_loggerFactory);
             _logger = _loggerFactory.CreateLogger<TestsForInfiniteDeadManSwitchRunner>();
-            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(deadManSwitchLoggerFactory));
-            _runner = new InfiniteDeadManSwitchRunner(deadManSwitchLoggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(), _sessionFactory);
+            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(loggerFactory));
+            _runner = new InfiniteDeadManSwitchRunner(loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(), _sessionFactory);
         }
 
         public void Dispose()
@@ -325,7 +325,7 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
         {
-            return async (deadManSwitch, cancellationToken) => { await deadManSwitch.NotifyAsync(notification, cancellationToken).ConfigureAwait(false); };
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification));
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
@@ -344,12 +344,12 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Pause()
         {
-            return (deadManSwitch, cancellationToken) => deadManSwitch.SuspendAsync(cancellationToken).AsTask();
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Suspend());
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Resume()
         {
-            return (deadManSwitch, cancellationToken) => deadManSwitch.ResumeAsync(cancellationToken).AsTask();
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume());
         }
 
         #endregion
