@@ -1,36 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DeadManSwitch.Tests
 {
-    public class ConfigurableDeadManSwitchInfiniteWorker : IDeadManSwitchInfiniteWorker
+    public class ConfigurableDeadManSwitchInfiniteWorker : IInfiniteDeadManSwitchWorker
     {
-        private List<Func<IDeadManSwitch, Task>> Actions { get; }
-        private int _actionIndex = 0;
+        private List<Func<IDeadManSwitch, CancellationToken, Task>> Iterations { get; }
+        
+        private int _iterationIndex;
 
-        public ConfigurableDeadManSwitchInfiniteWorker(TimeSpan timeout, TimeSpan delay, IEnumerable<Func<IDeadManSwitch, Task>> actions)
+        public ConfigurableDeadManSwitchInfiniteWorker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> iterations)
         {
-            Timeout = timeout;
-            Delay = delay;
-            Actions = actions?.ToList() ?? new List<Func<IDeadManSwitch, Task>>();
+            Iterations = iterations?.ToList() ?? new List<Func<IDeadManSwitch, CancellationToken, Task>>();
         }
 
         public string Name => "Configurable dead man's switch";
-        public TimeSpan Timeout { get; }
-        public TimeSpan Delay { get; }
 
-        public async Task ExecuteAsync(IDeadManSwitch deadManSwitch)
+        public async Task WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
         {
             if (deadManSwitch == null) throw new ArgumentNullException(nameof(deadManSwitch));
             
-            if (deadManSwitch.CancellationToken.IsCancellationRequested)
-                return;
+            if (cancellationToken.IsCancellationRequested)
+                throw new OperationCanceledException(cancellationToken);
             
-            if (_actionIndex < Actions.Count)
+            if (_iterationIndex < Iterations.Count)
             {
-                await Actions[_actionIndex++](deadManSwitch).ConfigureAwait(false);
+                var iteration = Iterations[_iterationIndex];
+                _iterationIndex++;
+                await iteration(deadManSwitch, cancellationToken).ConfigureAwait(false);
             }
             else
             {

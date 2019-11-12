@@ -1,33 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DeadManSwitch.Tests
 {
-    public class ConfigurableDeadManSwitchWorker : IDeadManSwitchWorker<>
+    public class ConfigurableDeadManSwitchWorker<TResult> : IDeadManSwitchWorker<TResult>
     {
-        private List<Func<IDeadManSwitch, Task>> Actions { get; }
+        private readonly Func<IDeadManSwitch, CancellationToken, Task> _work;
+        private readonly Task<TResult> _result;
 
-        public ConfigurableDeadManSwitchWorker(TimeSpan timeout, IEnumerable<Func<IDeadManSwitch, Task>> actions)
+        public string Name => "Configurable worker";
+
+        public ConfigurableDeadManSwitchWorker(Func<IDeadManSwitch, CancellationToken, Task> work, Task<TResult> result)
         {
-            Timeout = timeout;
-            Actions = actions?.ToList() ?? new List<Func<IDeadManSwitch, Task>>();
+            _work = work ?? throw new ArgumentNullException(nameof(work));
+            _result = result ?? throw new ArgumentNullException(nameof(result));
         }
 
-        public string Name => "Configurable dead man's switch";
-        
-        public TimeSpan Timeout { get; }
-
-        public async Task ExecuteAsync(IDeadManSwitch deadManSwitch)
+        public async Task<TResult> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
         {
-            foreach (var action in Actions)
-            {
-                if (deadManSwitch.CancellationToken.IsCancellationRequested)
-                    break;
-                
-                await action(deadManSwitch).ConfigureAwait(false);
-            }
+            await _work(deadManSwitch, cancellationToken).ConfigureAwait(false);
+
+            return await _result.ConfigureAwait(false);
         }
     }
 }

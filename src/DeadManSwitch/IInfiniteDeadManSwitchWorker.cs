@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 namespace DeadManSwitch
 {
     /// <summary>
-    /// Represents a worker that should be cancelled automatically if it does not notify the dead man's switch in a timely fashion
+    /// Represents a worker that should be cancelled automatically if it does not pull the dead man's switch in a timely fashion.
+    /// An <see cref="IInfiniteDeadManSwitchWorker"/> will be called repeatedly after each execution 
     /// </summary>
-    /// <typeparam name="TResult">The type of result this worker produces</typeparam>
-    public interface IDeadManSwitchWorker<TResult>
+    public interface IInfiniteDeadManSwitchWorker
     {
         /// <summary>
-        /// The name of this worker, for diagnostic purposes
+        /// The name of this worker
         /// </summary>
         string Name { get; }
 
@@ -20,7 +20,6 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="deadManSwitch">The dead man's switch that should be notified every x seconds.</param>
         /// <param name="cancellationToken">The cancellation token that will be marked as cancelled when the dead man's switch is not notified in a timely fashion</param>
-        /// <returns><typeparamref name="TResult"/></returns>
-        Task<TResult> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken);
+        Task WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken);
     }
 }

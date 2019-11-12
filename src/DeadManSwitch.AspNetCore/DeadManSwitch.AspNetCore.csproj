@@ -3,17 +3,17 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>7.3</LangVersion>
-        <Title>Dead Man's Switch</Title>
+        <Title>Dead Man's Switch ASP.NET Core integration</Title>
         <Authors>Alexander Moerman</Authors>
         <PackageProjectUrl>https://github.com/amoerie/dead-man-switch</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amoerie/dead-man-switch</RepositoryUrl>
         <RepositoryType>GIT</RepositoryType>
         <AssemblyVersion>0.1.1</AssemblyVersion>
         <FileVersion>0.1.1</FileVersion>
-        <DocumentationFile>bin\$(Configuration)\DeadManSwitch.xml</DocumentationFile>
-        <RootNamespace>DeadManSwitch</RootNamespace>
+        <DocumentationFile>bin\$(Configuration)\DeadManSwitch.AspNetCore.xml</DocumentationFile>
+        <RootNamespace>DeadManSwitch.AspNetCore</RootNamespace>
         <PackageVersion>0.1.1</PackageVersion>
-        <Description>A dead man's switch is designed to detect a worker task that is no longer making progress and cancel it. It does this by cancelling a CancellationToken that is provided to the worker from the start. In turn, the process is responsible for notifying the dead man's switch in a periodic fashion to prevent its own cancellation.</Description>
+        <Description>Integration with ASP.NET core logging and dependency injection for the dead man's switch</Description>
         <Copyright>MIT</Copyright>
         <PackageIcon>icon.png</PackageIcon>
         <PackageTags>tasks, cancellation, workers</PackageTags>
@@ -21,13 +21,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6"  >
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
           <DevelopmentDependency>true</DevelopmentDependency>
           <PrivateAssets>All</PrivateAssets>
       </PackageReference>
-      <PackageReference Include="System.Threading.Channels" Version="4.6.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj" />
+      <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj" />
+    </ItemGroup>
+    
     <ItemGroup>
         <None Include="../../icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>

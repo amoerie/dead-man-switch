@@ -8,8 +8,8 @@ namespace DeadManSwitch.Internal
 {
     internal interface IDeadManSwitchContext : IDisposable
     {
-        CancellationTokenSource CancellationTokenSource { get; }
-        
+        CancellationTokenSource CancellationTokenSource { get; set; }
+
         ValueTask EnqueueStatusAsync(DeadManSwitchStatus deadManSwitchStatus, CancellationToken cancellationToken);
         ValueTask<DeadManSwitchStatus> DequeueStatusAsync(CancellationToken cancellationToken);
 
@@ -19,9 +19,7 @@ namespace DeadManSwitch.Internal
     
     internal sealed class DeadManSwitchContext : IDeadManSwitchContext
     {
-        private readonly DeadManSwitchOptions _deadManSwitchOptions;
-        private readonly Channel<DeadManSwitchNotification> _notifications;
-        private readonly Channel<DeadManSwitchStatus> _statuses;
+        private readonly int _numberOfNotificationsToKeep;
         private readonly ChannelWriter<DeadManSwitchNotification> _notificationsWriter;
         private readonly ChannelReader<DeadManSwitchNotification> _notificationsReader;
         private readonly ChannelReader<DeadManSwitchStatus> _statusesReader;
@@ -29,26 +27,29 @@ namespace DeadManSwitch.Internal
 
         public DeadManSwitchContext(DeadManSwitchOptions deadManSwitchOptions)
         {
-            _deadManSwitchOptions = deadManSwitchOptions ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
-            _notifications = Channel.CreateBounded<DeadManSwitchNotification>(new BoundedChannelOptions(deadManSwitchOptions.NumberOfNotificationsToKeep)
+            if (deadManSwitchOptions == null) throw new ArgumentNullException(nameof(deadManSwitchOptions));
+            
+            var notifications = Channel.CreateBounded<DeadManSwitchNotification>(new BoundedChannelOptions(deadManSwitchOptions.NumberOfNotificationsToKeep)
+            {
+                SingleWriter = false,
+                SingleReader = true,
+                FullMode = BoundedChannelFullMode.DropOldest
+            });
+            var statuses = Channel.CreateUnbounded<DeadManSwitchStatus>(new UnboundedChannelOptions
             {
                 SingleWriter = false,
                 SingleReader = true
             });
-            _statuses = Channel.CreateUnbounded<DeadManSwitchStatus>(new UnboundedChannelOptions
-            {
-                SingleWriter = false,
-                SingleReader = true
-            });
-            _notificationsReader = _notifications.Reader;
-            _notificationsWriter = _notifications.Writer;
-            _statusesReader = _statuses.Reader;
-            _statusesWriter = _statuses.Writer;
+            _numberOfNotificationsToKeep = deadManSwitchOptions.NumberOfNotificationsToKeep;
+            _notificationsReader = notifications.Reader;
+            _notificationsWriter = notifications.Writer;
+            _statusesReader = statuses.Reader;
+            _statusesWriter = statuses.Writer;
             
             CancellationTokenSource = new CancellationTokenSource();
         }
 
-        public CancellationTokenSource CancellationTokenSource { get; }
+        public CancellationTokenSource CancellationTokenSource { get; set; }
 
         public ValueTask EnqueueStatusAsync(DeadManSwitchStatus deadManSwitchStatus, CancellationToken cancellationToken)
         {
@@ -67,7 +68,7 @@ namespace DeadManSwitch.Internal
         
         public ValueTask<IEnumerable<DeadManSwitchNotification>> GetNotificationsAsync(CancellationToken cancellationToken)
         {
-            var notifications = new List<DeadManSwitchNotification>(_deadManSwitchOptions.NumberOfNotificationsToKeep);
+            var notifications = new List<DeadManSwitchNotification>(_numberOfNotificationsToKeep);
             while (_notificationsReader.TryRead(out var notification))
                 notifications.Add(notification);
             return new ValueTask<IEnumerable<DeadManSwitchNotification>>(notifications);
@@ -75,7 +76,7 @@ namespace DeadManSwitch.Internal
 
         public void Dispose()
         {
-            CancellationTokenSource?.Dispose();
+            CancellationTokenSource.Dispose();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
 {
@@ -10,19 +9,20 @@ namespace DeadManSwitch.Internal
 
     internal class DeadManSwitchSessionFactory : IDeadManSwitchSessionFactory
     {
-        private readonly ILogger _logger;
+        private readonly IDeadManSwitchLoggerFactory _loggerFactory;
 
-        public DeadManSwitchSessionFactory(ILogger logger)
+        public DeadManSwitchSessionFactory(IDeadManSwitchLoggerFactory loggerFactory)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory;
         }
 
         public IDeadManSwitchSession Create(DeadManSwitchOptions deadManSwitchOptions)
         {
             var deadManSwitchContext = new DeadManSwitchContext(deadManSwitchOptions);
-            var deadManSwitch = new DeadManSwitch(deadManSwitchContext, _logger);
-            var deadManSwitchTriggerer = new DeadManSwitchTriggerer(deadManSwitchContext, deadManSwitchOptions, _logger);
-            var deadManSwitchWatcher = new DeadManSwitchWatcher(deadManSwitchContext, deadManSwitchOptions, deadManSwitchTriggerer, _logger);
+            var deadManSwitch = new DeadManSwitch(deadManSwitchContext, _loggerFactory.CreateLogger<DeadManSwitch>());
+            var deadManSwitchTriggerer = new DeadManSwitchTriggerer(deadManSwitchContext, deadManSwitchOptions, _loggerFactory.CreateLogger<DeadManSwitchTriggerer>());
+            var deadManSwitchWatcher =
+                new DeadManSwitchWatcher(deadManSwitchContext, deadManSwitchOptions, deadManSwitchTriggerer, _loggerFactory.CreateLogger<DeadManSwitchWatcher>());
             return new DeadManSwitchSession(deadManSwitchContext, deadManSwitch, deadManSwitchWatcher);
         }
     }

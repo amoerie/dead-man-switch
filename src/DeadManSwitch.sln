@@ -7,13 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch", "DeadManSwi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch.Tests", "DeadManSwitch.Tests\DeadManSwitch.Tests.csproj", "{4926E5B1-CE92-4037-A737-04EF5D6BC0C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch.Examples", "DeadManSwitch.Examples\DeadManSwitch.Examples.csproj", "{CC4538FE-3C94-488E-9A14-B8FC550A16F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeadManSwitch.Examples.AspNetCore", "DeadManSwitch.Examples.AspNetCore\DeadManSwitch.Examples.AspNetCore.csproj", "{CC4538FE-3C94-488E-9A14-B8FC550A16F2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4787371-884A-4378-A7DF-46DB5C7D9EEB}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		NuGet.config = NuGet.config
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.AspNetCore", "DeadManSwitch.AspNetCore\DeadManSwitch.AspNetCore.csproj", "{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Examples.AspNetFramework", "DeadManSwitch.Examples.AspNetFramework\DeadManSwitch.Examples.AspNetFramework.csproj", "{56DB1403-B120-4740-8550-A51A450B9AAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC4538FE-3C94-488E-9A14-B8FC550A16F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56DB1403-B120-4740-8550-A51A450B9AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56DB1403-B120-4740-8550-A51A450B9AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56DB1403-B120-4740-8550-A51A450B9AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56DB1403-B120-4740-8550-A51A450B9AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

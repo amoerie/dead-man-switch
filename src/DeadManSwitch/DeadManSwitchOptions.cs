@@ -1,29 +1,20 @@
 ﻿using System;
-using System.Threading;
-using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch
 {
-    public sealed class DeadManSwitchOptions
+    /// <summary>
+    /// The options that modify the behavior of the dead man's switch
+    /// </summary>
+    public class DeadManSwitchOptions
     {
         /// <summary>
-        /// The logger to which diagnostic information is written
+        /// The amount of time the dead man's switch will wait for a signal before canceling the worker
         /// </summary>
-        public ILogger Logger { get; set; }
-        
+        public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(1);
+
         /// <summary>
-        /// The amount of time the dead man's switch will wait for a signal before canceling the task
+        /// How many notifications to keep in memory (for diagnostic purposes)
         /// </summary>
-        public TimeSpan Timeout { get; set; }
-        
-        /// <summary>
-        /// The cancellation token that cancels the dead man's switch. This cancels both the dead man's switch loop and the tasks it is connected to.
-        /// </summary>
-        public CancellationToken CancellationToken { get; set; }
-        
-        /// <summary>
-        /// How many notifications to maintain in memory for diagnostic purposes
-        /// </summary>
-        public int NumberOfNotificationsToKeep { get; set; }
+        public int NumberOfNotificationsToKeep { get; set; } = 10;
     }
 }
