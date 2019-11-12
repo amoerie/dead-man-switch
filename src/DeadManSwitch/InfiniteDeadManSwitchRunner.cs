@@ -90,7 +90,7 @@ namespace DeadManSwitch
 
                             _logger.Debug("Worker {WorkerName} completed gracefully", worker.Name);
 
-                            await deadManSwitch.NotifyAsync("Worker task completed gracefully", CancellationToken.None).ConfigureAwait(false);
+                            deadManSwitch.Notify("Worker task completed gracefully");
                         }
                         catch (OperationCanceledException)
                         {
@@ -99,7 +99,7 @@ namespace DeadManSwitch
                             // Restart watcher
                             await watcherTask.ConfigureAwait(false);
 
-                            await deadManSwitch.NotifyAsync("Worker task was canceled", CancellationToken.None).ConfigureAwait(false);
+                            deadManSwitch.Notify("Worker task was canceled");
 
                             watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning,
                                 TaskScheduler.Default);
