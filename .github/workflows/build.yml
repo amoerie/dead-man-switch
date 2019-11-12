@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macOS-latest]
+        os: [windows-2019, ubuntu-18.04, macOS-10.15]
         dotnet-version: [2.2.108]
 
     steps:
@@ -27,15 +27,17 @@ jobs:
       run: dotnet build ./src/DeadManSwitch.Examples.AspNetCore/DeadManSwitch.Examples.AspNetCore.csproj --configuration Release
     
     - name: Build DeadManSwitch.Examples.AspNetFramework
-      run: msbuild ./src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj -target:Build -restore -property:Configuration=Release
-      if: matrix.os == 'windows-latest'
+      run: |
+           cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
+           .\MSBuild.exe $Env:GITHUB_WORKSPACE/src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj -target:Build -restore -property:Configuration=Release
+      if: matrix.os == 'windows-2019'
     
     - name: Run DeadManSwitch.Tests on .NET Core
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
     
     - name: Run DeadManSwitch.Tests on .NET Framework
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework net48
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2019'
     
     - name: Run DeadManSwitch.AspNetCore.Tests
       run: dotnet test ./src/DeadManSwitch.AspNetCore.Tests/DeadManSwitch.AspNetCore.Tests.csproj --configuration Release --framework netcoreapp2.1
