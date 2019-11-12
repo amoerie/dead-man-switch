@@ -74,3 +74,11 @@ See the examples projects for a sample program that notifies the dead man's swit
 
 - [DeadManSwitch](https://www.nuget.org/packages/DeadManSwitch/)
 - [DeadManSwitch.AspNetCore](https://www.nuget.org/packages/DeadManSwitch.AspNetCore/)
+
+# Changelog 
+
+See the [CHANGELOG.MD](https://github.com/amoerie/dead-man-switch/tree/master/CHANGELOG.MD) file
+
+# Contributors 
+
+See the [CONTRIBUTORS.MD](https://github.com/amoerie/dead-man-switch/tree/master/CONTRIBUTORS.MD) file

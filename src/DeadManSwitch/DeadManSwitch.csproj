@@ -21,7 +21,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6"  >
+      <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
           <DevelopmentDependency>true</DevelopmentDependency>
           <PrivateAssets>All</PrivateAssets>
       </PackageReference>
@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="../../icon.png" Pack="true" PackagePath="\"/>
+        <None Include="../../icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>
