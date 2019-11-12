@@ -1,6 +1,10 @@
 # 💀 Changelog
 
-# 0.2.0 ???
+# 0.2.1 November 12th, 2019
+
+Make DeadManSwitch.AspNetCore dependent on DeadManSwitch as a nuget package, not as a project reference
+
+# 0.2.0 November 12th, 2019
 
 Remove usage of System.Threading.Channels
 Make IDeadManSwitch interface synchronous (NotifyAsync -> Notify, etc.)

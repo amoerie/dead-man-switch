@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeadManSwitch, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DeadManSwitch.0.1.1\lib\netstandard2.0\DeadManSwitch.dll</HintPath>
+    <Reference Include="DeadManSwitch, Version=0.2.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DeadManSwitch.0.2.0\lib\netstandard2.0\DeadManSwitch.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />

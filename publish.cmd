@@ -1,4 +1,4 @@
-SET nugetversion=0.2.0
+SET nugetversion=0.2.1
 dotnet pack ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release --include-source
 dotnet pack ./src/DeadManSwitch.AspNetCore/DeadManSwitch.AspNetCore.csproj --configuration Release --include-source
 dotnet nuget push ./src/DeadManSwitch/bin/Release/DeadManSwitch.%nugetversion%.nupkg --source nuget.org
