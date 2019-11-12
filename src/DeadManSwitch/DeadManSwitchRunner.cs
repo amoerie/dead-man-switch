@@ -44,6 +44,15 @@ namespace DeadManSwitch
         /// <summary>
         /// Creates a new <see cref="IDeadManSwitchRunner"/> that is capable of running <see cref="IDeadManSwitchWorker{TResult}"/>
         /// </summary>
+        /// <returns>A new <see cref="IDeadManSwitchRunner"/> that is capable of running <see cref="IDeadManSwitchWorker{TResult}"/></returns>
+        public static IDeadManSwitchRunner Create()
+        {
+            return Create(new SilentDeadManSwitchLoggerFactory());
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="IDeadManSwitchRunner"/> that is capable of running <see cref="IDeadManSwitchWorker{TResult}"/>
+        /// </summary>
         /// <param name="loggerFactory">The factory that is capable of creating loggers</param>
         /// <returns>A new <see cref="IDeadManSwitchRunner"/> that is capable of running <see cref="IDeadManSwitchWorker{TResult}"/></returns>
         public static IDeadManSwitchRunner Create(IDeadManSwitchLoggerFactory loggerFactory)
