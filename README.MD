@@ -32,21 +32,22 @@ There are two types of workers you can implement:
             if (deadManSwitch == null)
                 throw new ArgumentNullException(nameof(deadManSwitch));
 
-            await deadManSwitch.NotifyAsync("Beginning work", cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Notify("Beginning work");
 
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
-            await deadManSwitch.NotifyAsync("Still busy, please don't cancel", cancellationToken).ConfigureAwait(false);
+            // tell the dead man's switch to postpone cancellation
+            deadManSwitch.Notify("Still busy, please don't cancel");
 
             await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
 
             // tell the dead man's switch to stop the clock
-            await deadManSwitch.SuspendAsync(cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Suspend();
 
             await DoSomethingThatCanTakeVeryLong(cancellationToken).ConfigureAwait(false);
 
             // tell the dead man's switch to resume the clock
-            await deadManSwitch.ResumeAsync(cancellationToken).ConfigureAwait(false);
+            deadManSwitch.Resume();
 
             return Math.PI;
         }
