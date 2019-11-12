@@ -31,6 +31,7 @@ namespace DeadManSwitch
         /// <summary>
         /// Resumes the dead man's switch after pausing it.
         /// </summary>
+        [SuppressMessage("Naming", "CA1716", Justification = "Resume is the logical counterpart to Suspend")]
         void Resume();
     }
 
