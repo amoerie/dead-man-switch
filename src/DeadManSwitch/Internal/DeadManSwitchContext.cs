@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace DeadManSwitch.Internal
 {
@@ -19,7 +17,7 @@ namespace DeadManSwitch.Internal
         void AddNotification(DeadManSwitchNotification deadManSwitchNotification);
         IReadOnlyList<DeadManSwitchNotification> GetNotifications();
     }
-    
+
     internal sealed class DeadManSwitchContext : IDeadManSwitchContext
     {
         public long LastNotifiedTicks => Interlocked.Read(ref _lastNotifiedTicks);
@@ -66,7 +64,7 @@ namespace DeadManSwitch.Internal
                 _notificationsNextItemIndex = (_notificationsNextItemIndex + 1) % _notifications.Length;
             }
         }
-        
+
         public IReadOnlyList<DeadManSwitchNotification> GetNotifications()
         {
             DeadManSwitchNotification[] oldNotifications;
