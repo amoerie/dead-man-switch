@@ -7,7 +7,7 @@ namespace DeadManSwitch.Logging
     /// A logger that can write log messages
     /// </summary>
     /// <typeparam name="T">The log context</typeparam>
-    public interface IDeadManSwitchLogger<T>
+    public interface IDeadManSwitchLogger<out T>
     {
         /// <summary>
         /// Logs a trace message 
