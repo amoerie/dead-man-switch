@@ -7,7 +7,7 @@ namespace DeadManSwitch.Internal
 {
     internal interface IDeadManSwitchWatcher
     {
-        ValueTask WatchAsync(CancellationToken cancellationToken);
+        Task WatchAsync(CancellationToken cancellationToken);
     }
 
     internal sealed class DeadManSwitchWatcher : IDeadManSwitchWatcher
@@ -34,58 +34,35 @@ namespace DeadManSwitch.Internal
         /// You should pass this cancellation token to any worker that must be cancelled.
         /// </summary>
         /// <returns>A value indicating whether the dead man's switch triggered or not</returns>
-        public async ValueTask WatchAsync(CancellationToken cancellationToken)
+        public async Task WatchAsync(CancellationToken cancellationToken)
         {
             _logger.Debug("Watching dead man's switch");
 
-            var status = DeadManSwitchStatus.NotificationReceived;
-
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (status == DeadManSwitchStatus.Suspended)
+                TimeSpan timeSinceLastNotification;
+
+                if (!_context.IsSuspended)
+                {
+                    timeSinceLastNotification = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - _context.LastNotifiedTicks); ;
+
+                    if (timeSinceLastNotification > _options.Timeout)
+                    {
+                        _deadManSwitchTriggerer.Trigger();
+                        return;
+                    }
+                } 
+                else
                 {
                     _logger.Debug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");
 
-                    // ignore any notifications and wait until the switch goes through the 'Resumed' status
-                    while (status != DeadManSwitchStatus.Resumed)
-                    {
-                        try
-                        {
-                            status = await _context.DequeueStatusAsync(cancellationToken).ConfigureAwait(false);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            _logger.Debug("Dead man switch was canceled while waiting to be resumed.");
-                            return;
-                        }
-                    }
-
-                    _logger.Debug("The dead man's switch is now resuming.");
+                    timeSinceLastNotification = TimeSpan.Zero;
                 }
 
-                using (var timeoutCTS = new CancellationTokenSource(_options.Timeout))
-                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCTS.Token))
-                {
-                    try
-                    {
-                        status = await _context.DequeueStatusAsync(cts.Token).ConfigureAwait(false);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            _logger.Debug("Dead man switch watcher was canceled while waiting for the next notification");
-                            return;
-                        }
+                var timeRemaining = _options.Timeout - timeSinceLastNotification;
 
-                        if (timeoutCTS.IsCancellationRequested)
-                        {
-                            await _deadManSwitchTriggerer.TriggerAsync(cancellationToken).ConfigureAwait(false);
-
-                            return;
-                        }
-                    }
-                }
+                await Task.Delay(timeRemaining, cancellationToken)
+                    .ConfigureAwait(false);
             }
 
             _logger.Debug("Dead man switch watcher was canceled");
