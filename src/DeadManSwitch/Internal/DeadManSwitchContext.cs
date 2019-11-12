@@ -8,40 +8,40 @@ namespace DeadManSwitch.Internal
     {
         bool IsSuspended { get; }
         long LastNotifiedTicks { get; }
-
-        CancellationTokenSource CancellationTokenSource { get; set; }
+        CancellationToken CancellationToken { get; }
+        IEnumerable<DeadManSwitchNotification> Notifications { get; }
 
         void Suspend();
         void Resume();
-
         void AddNotification(DeadManSwitchNotification deadManSwitchNotification);
-        IReadOnlyList<DeadManSwitchNotification> GetNotifications();
+        void Cancel();
     }
 
     internal sealed class DeadManSwitchContext : IDeadManSwitchContext
     {
+        private readonly DeadManSwitchOptions _deadManSwitchOptions;
+        private readonly DeadManSwitchNotification[] _notifications;
+        private readonly object _notificationsSyncRoot;
+
         public long LastNotifiedTicks => Interlocked.Read(ref _lastNotifiedTicks);
         public bool IsSuspended => _isSuspended;
+        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
-        public CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
-
-
-        private long _lastNotifiedTicks = DateTime.UtcNow.Ticks;
-
-        private DeadManSwitchNotification[] _notifications;
-        private int _notificationsNextItemIndex = 0;
-        private readonly object _notificationsSyncRoot = new object();
+        private CancellationTokenSource _cancellationTokenSource;
+        private long _lastNotifiedTicks;
+        private int _notificationsNextItemIndex;
 
         private volatile bool _isSuspended;
 
-
         public DeadManSwitchContext(DeadManSwitchOptions deadManSwitchOptions)
         {
-            if (deadManSwitchOptions == null) throw new ArgumentNullException(nameof(deadManSwitchOptions));
-
-            _notifications = new DeadManSwitchNotification[deadManSwitchOptions.NumberOfNotificationsToKeep];
+            _deadManSwitchOptions = deadManSwitchOptions ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
+            _notifications = new DeadManSwitchNotification[_deadManSwitchOptions.NumberOfNotificationsToKeep];
+            _lastNotifiedTicks = DateTime.UtcNow.Ticks;
+            _notificationsNextItemIndex = 0;
+            _notificationsSyncRoot = new object();
+            _cancellationTokenSource = new CancellationTokenSource();
         }
-
 
         public void Suspend()
         {
@@ -65,40 +65,40 @@ namespace DeadManSwitch.Internal
             }
         }
 
-        public IReadOnlyList<DeadManSwitchNotification> GetNotifications()
+        public void Cancel()
         {
-            DeadManSwitchNotification[] oldNotifications;
-            int oldNextItemIndex;
+            var cancellationTokenSource = Interlocked.Exchange(ref _cancellationTokenSource, new CancellationTokenSource());
 
-            lock (_notificationsSyncRoot)
+            cancellationTokenSource.Cancel();
+            cancellationTokenSource.Dispose();
+        }
+
+        public IEnumerable<DeadManSwitchNotification> Notifications
+        {
+            get
             {
-                oldNotifications = _notifications;
-                oldNextItemIndex = _notificationsNextItemIndex;
+                var numberOfNotificationsToKeep = _deadManSwitchOptions.NumberOfNotificationsToKeep;
+                var notifications = new List<DeadManSwitchNotification>(numberOfNotificationsToKeep);
 
-                _notifications = new DeadManSwitchNotification[oldNotifications.Length];
-                _notificationsNextItemIndex = 0;
+                lock (_notificationsSyncRoot)
+                {
+                    for (var i = _notificationsNextItemIndex; i < numberOfNotificationsToKeep + _notificationsNextItemIndex; i++)
+                    {
+                        var notification = _notifications[(i + _notificationsNextItemIndex) % numberOfNotificationsToKeep];
+                        if (notification == null)
+                            continue;
+
+                        notifications.Add(notification);
+                    }
+                }
+
+                return notifications;
             }
-
-
-            var notificationsList = new List<DeadManSwitchNotification>(oldNotifications.Length);
-
-            for (int x = 0; x < oldNotifications.Length; ++x)
-            {
-                var currentNotification = oldNotifications[(x + oldNextItemIndex) % oldNotifications.Length];
-
-                // Expect to only occur if less than the maximum number of items have been queued.
-                if (currentNotification == null)
-                    continue;
-
-                notificationsList.Add(currentNotification);
-            }
-
-            return notificationsList;
         }
 
         public void Dispose()
         {
-            CancellationTokenSource.Dispose();
+            _cancellationTokenSource.Dispose();
         }
     }
 }

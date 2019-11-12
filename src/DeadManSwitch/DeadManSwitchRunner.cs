@@ -71,7 +71,7 @@ namespace DeadManSwitch
 
             using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options))
             using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationTokenSource.Token))
+            using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationToken))
             {
                 _logger.Trace("Running worker {WorkerName} using a dead man's switch", worker.Name);
 
