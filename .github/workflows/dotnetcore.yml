@@ -24,6 +24,6 @@ jobs:
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
     - name: Run DeadManSwitch.Tests on .NET Framework
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework net48
-      if: matrix.os == "windows-latest"
+      if: matrix.os == 'windows-latest'
     - name: Run DeadManSwitch.AspNetCore.Tests
       run: dotnet test ./src/DeadManSwitch.AspNetCore.Tests/DeadManSwitch.AspNetCore.Tests.csproj --configuration Release --framework netcoreapp2.1
