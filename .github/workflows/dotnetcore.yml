@@ -8,14 +8,14 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
-        dotnet: [2.2.108]
+        dotnet-version: [2.2.108]
 
     steps:
     - uses: actions/checkout@v1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ matrix.dotnet }}
+        dotnet-version: ${{ matrix.dotnet-version }}
     - name: Build DeadManSwitch
       run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
     - name: Build DeadManSwitch.AspNetCore
@@ -24,6 +24,6 @@ jobs:
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
     - name: Run DeadManSwitch.Tests on .NET Framework
       run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework net48
-      if: ${{ matrix.os }} == "windows-latest"
+      if: matrix.os == "windows-latest"
     - name: Run DeadManSwitch.AspNetCore.Tests
       run: dotnet test ./src/DeadManSwitch.AspNetCore.Tests/DeadManSwitch.AspNetCore.Tests.csproj --configuration Release --framework netcoreapp2.1
