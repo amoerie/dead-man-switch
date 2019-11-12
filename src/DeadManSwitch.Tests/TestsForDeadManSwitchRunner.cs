@@ -450,7 +450,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.Notifications;
                 string[] expected =
                 {
                     "Notification 1",
@@ -485,7 +485,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.Notifications;
                 string[] expected =
                 {
                     "Notification 2",
@@ -525,7 +525,7 @@ namespace DeadManSwitch.Tests
                 // Assert
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
-                var notifications = _sessionFactory.Session.DeadManSwitchContext.GetNotifications();
+                var notifications = _sessionFactory.Session.DeadManSwitchContext.Notifications;
                 notifications.Should().HaveCount(3);
             }
         }

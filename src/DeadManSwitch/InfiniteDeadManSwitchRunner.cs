@@ -78,7 +78,7 @@ namespace DeadManSwitch
                 var iteration = 1;
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchContext.CancellationTokenSource.Token))
+                    using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchContext.CancellationToken))
                     {
                         _logger.Trace("Beginning work iteration {Iteration} of infinite worker {WorkerName} using a dead man's switch", iteration, worker.Name);
 
