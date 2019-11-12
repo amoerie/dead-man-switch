@@ -22,6 +22,9 @@ jobs:
       run: dotnet build ./src/DeadManSwitch.AspNetCore/DeadManSwitch.AspNetCore.csproj --configuration Release
     - name: Build DeadManSwitch.Examples.AspNetCore
       run: dotnet build ./src/DeadManSwitch.Examples.AspNetCore/DeadManSwitch.Examples.AspNetCore.csproj --configuration Release
+    - name: Restore DeadManSwitch.Examples.AspNetFramework
+      run: dotnet restore ./src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj
+      if: matrix.os == 'windows-latest'
     - name: Build DeadManSwitch.Examples.AspNetFramework
       run: dotnet build ./src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj --configuration Release
       if: matrix.os == 'windows-latest'
