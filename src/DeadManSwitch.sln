@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Examples.AspN
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Benchmarks", "DeadManSwitch.Benchmarks\DeadManSwitch.Benchmarks.csproj", "{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.AspNetCore.Tests", "DeadManSwitch.AspNetCore.Tests\DeadManSwitch.AspNetCore.Tests.csproj", "{63B51115-639A-4E4A-978B-74044467B958}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63B51115-639A-4E4A-978B-74044467B958}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63B51115-639A-4E4A-978B-74044467B958}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63B51115-639A-4E4A-978B-74044467B958}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63B51115-639A-4E4A-978B-74044467B958}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
