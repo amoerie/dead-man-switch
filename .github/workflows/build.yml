@@ -16,10 +16,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
-    
-    - name: Restore nuget packages
-      run: nuget restore ./src/DeadManSwitch.sln
-      if: matrix.os == 'windows-latest'
       
     - name: Build DeadManSwitch
       run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
@@ -31,7 +27,7 @@ jobs:
       run: dotnet build ./src/DeadManSwitch.Examples.AspNetCore/DeadManSwitch.Examples.AspNetCore.csproj --configuration Release
     
     - name: Build DeadManSwitch.Examples.AspNetFramework
-      run: dotnet build ./src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj --configuration Release
+      run: msbuild ./src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj -target:Build -restore -property:Configuration=Release
       if: matrix.os == 'windows-latest'
     
     - name: Run DeadManSwitch.Tests on .NET Core
