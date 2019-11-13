@@ -61,9 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExampleInfiniteProgram.cs" />
-    <Compile Include="ExampleInfiniteWorker.cs" />
     <Compile Include="ExampleProgram.cs" />
-    <Compile Include="ExampleWorker.cs" />
     <Compile Include="Logging\NLogger.cs" />
     <Compile Include="Logging\NLoggerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
