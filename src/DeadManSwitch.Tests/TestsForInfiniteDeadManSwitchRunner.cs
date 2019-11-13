@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DeadManSwitch.Internal;
@@ -252,7 +253,7 @@ namespace DeadManSwitch.Tests
                         Do(_ => cts.Cancel())
                     )
                 );
-                var worker = new ConfigurableDeadManSwitchInfiniteWorker(workItems);
+                var worker = Worker(workItems);
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
@@ -284,7 +285,7 @@ namespace DeadManSwitch.Tests
                         Do(_ => cts.Cancel())
                     )
                 );
-                var worker = new ConfigurableDeadManSwitchInfiniteWorker(workItems);
+                var worker = Worker(workItems);
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
@@ -318,14 +319,30 @@ namespace DeadManSwitch.Tests
             };
         }
 
-        private static ConfigurableDeadManSwitchInfiniteWorker Worker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> workItems)
+        private static IInfiniteDeadManSwitchWorker Worker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> workItems)
         {
-            return new ConfigurableDeadManSwitchInfiniteWorker(workItems);
+            var iterationIndex = 0;
+            var iterations = workItems.ToList();
+            return new LambdaInfiniteDeadManSwitchWorker(async (deadManSwitch, cancellationToken) =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                
+                if (iterationIndex < iterations.Count)
+                {
+                    var iteration = iterations[iterationIndex];
+                    iterationIndex++;
+                    await iteration(deadManSwitch, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    throw new Exception("No more actions");
+                }
+            });
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification));
+            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification), cancellationToken);
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
@@ -344,12 +361,12 @@ namespace DeadManSwitch.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Pause()
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Suspend());
+            return (deadManSwitch, cancellationToken) => Task.Run(deadManSwitch.Suspend, cancellationToken);
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Resume()
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume());
+            return (deadManSwitch, cancellationToken) => Task.Run(deadManSwitch.Resume, cancellationToken);
         }
 
         #endregion
