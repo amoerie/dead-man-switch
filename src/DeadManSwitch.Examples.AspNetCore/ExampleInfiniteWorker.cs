@@ -11,10 +11,7 @@ namespace DeadManSwitch.Examples.AspNetCore
 
         public async Task WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
         {
-            if (deadManSwitch is null)
-            {
-                throw new ArgumentNullException(nameof(deadManSwitch));
-            }
+            if (deadManSwitch is null) throw new ArgumentNullException(nameof(deadManSwitch));
 
             deadManSwitch.Notify("Beginning work again");
 

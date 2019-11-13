@@ -9,7 +9,7 @@ namespace DeadManSwitch.Examples.AspNetFramework
     public static class ExampleProgram
     {
         /// <summary>
-        /// Demonstrates how you can run a worker once, using a dead man's switch
+        ///     Demonstrates how you can run a worker once, using a dead man's switch
         /// </summary>
         public static async Task Main()
         {

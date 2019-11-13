@@ -23,15 +23,11 @@ namespace DeadManSwitch.Internal
         private readonly DeadManSwitchNotification[] _notifications;
         private readonly object _notificationsSyncRoot;
 
-        public long LastNotifiedTicks => Interlocked.Read(ref _lastNotifiedTicks);
-        public bool IsSuspended => _isSuspended;
-        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
-
         private CancellationTokenSource _cancellationTokenSource;
-        private long _lastNotifiedTicks;
-        private int _notificationsNextItemIndex;
 
         private volatile bool _isSuspended;
+        private long _lastNotifiedTicks;
+        private int _notificationsNextItemIndex;
 
         public DeadManSwitchContext(DeadManSwitchOptions deadManSwitchOptions)
         {
@@ -42,6 +38,10 @@ namespace DeadManSwitch.Internal
             _notificationsSyncRoot = new object();
             _cancellationTokenSource = new CancellationTokenSource();
         }
+
+        public long LastNotifiedTicks => Interlocked.Read(ref _lastNotifiedTicks);
+        public bool IsSuspended => _isSuspended;
+        public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
         public void Suspend()
         {

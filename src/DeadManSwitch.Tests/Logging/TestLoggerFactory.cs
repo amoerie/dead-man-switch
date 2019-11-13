@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 namespace DeadManSwitch.Tests.Logging
 {
     /// <summary>
-    /// Thin wrapper around <see cref="ILoggerFactory"/>
+    ///     Thin wrapper around <see cref="ILoggerFactory" />
     /// </summary>
     public class TestLoggerFactory : IDeadManSwitchLoggerFactory
     {
         private readonly ILoggerFactory _loggerFactory;
 
         /// <summary>
-        /// Creates a new <see cref="DeadManSwitchLoggerFactory"/> 
+        ///     Creates a new <see cref="DeadManSwitchLoggerFactory" />
         /// </summary>
         public TestLoggerFactory(ILoggerFactory loggerFactory)
         {

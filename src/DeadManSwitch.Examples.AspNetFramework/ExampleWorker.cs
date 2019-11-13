@@ -8,7 +8,7 @@ namespace DeadManSwitch.Examples.AspNetFramework
     {
         // for diagnostic purposes
         public string Name => "Example one time worker";
-        
+
         public async Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
         {
             if (deadManSwitch == null)

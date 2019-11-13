@@ -14,100 +14,6 @@ namespace DeadManSwitch.AspNetCore.Tests
 {
     public class TestsForDependencyInjection
     {
-        [Fact]
-        public void ShouldBeAbleToCreateADeadManSwitchRunner()
-        {
-            // Arrange
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(b => b.AddSerilog())
-                .AddDeadManSwitch()
-                .BuildServiceProvider();
-
-            // Act
-            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
-
-            // Arrange
-            runner.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void ShouldBeAbleToCreateAnInfiniteDeadManSwitchRunner()
-        {
-            // Arrange
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(b => b.AddSerilog())
-                .AddDeadManSwitch()
-                .BuildServiceProvider();
-
-            // Act
-            var runner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
-
-            // Arrange
-            runner.Should().NotBeNull();
-        }
-
-        [Fact]
-        public async Task ShouldBeAbleToRunCreatedRunner()
-        {
-            // Arrange
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(b => b.AddSerilog())
-                .AddDeadManSwitch()
-                .BuildServiceProvider(); 
-
-            // Act
-            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
-
-            var worker = Worker(
-                Work(
-                    Notify("Test")    
-                ), 
-                Result(Math.PI)
-            );
-            var result = await runner.RunAsync(worker, new DeadManSwitchOptions(), CancellationToken.None)
-                .ConfigureAwait(false);
-
-            // Arrange
-            runner.Should().NotBeNull();
-            result.Should().Be(Math.PI);
-        }
-
-        [Fact]
-        public async Task ShouldBeAbleToRunCreatedInfiniteRunner()
-        {
-            using (var cts = new CancellationTokenSource())
-            {
-                // Arrange
-                var serviceProvider = new ServiceCollection()
-                    .AddLogging(b => b.AddSerilog())
-                    .AddDeadManSwitch()
-                    .BuildServiceProvider();
-
-                // Act
-                var runner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
-
-                double? pi = null;
-                var worker = InfiniteWorker(
-                    WorkItems(
-                        Work(
-                            Do(_ => pi = Math.PI),
-                            Notify("Test")
-                        ),
-                        Work(
-                            Do(_ => cts.Cancel())
-                        )
-                    )
-                );
-                await runner.RunAsync(worker, new DeadManSwitchOptions(), cts.Token).ConfigureAwait(false);
-
-                // Arrange
-                runner.Should().NotBeNull();
-                pi.Should().Be(Math.PI);
-            }
-        }
-        
-        #region helper methods
-
         private static IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> WorkItems(params Func<IDeadManSwitch, CancellationToken, Task>[] workItems)
         {
             return workItems;
@@ -136,7 +42,7 @@ namespace DeadManSwitch.AspNetCore.Tests
             return new LambdaInfiniteDeadManSwitchWorker(async (deadManSwitch, cancellationToken) =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 if (iterationIndex < iterations.Count)
                 {
                     var iteration = iterations[iterationIndex];
@@ -149,7 +55,7 @@ namespace DeadManSwitch.AspNetCore.Tests
                 }
             });
         }
-        
+
         private static IDeadManSwitchWorker<TResult> Worker<TResult>(Func<IDeadManSwitch, CancellationToken, Task> work, Task<TResult> result)
         {
             return new LambdaDeadManSwitchWorker<TResult>(async (deadManSwitch, cancellationToken) =>
@@ -188,13 +94,102 @@ namespace DeadManSwitch.AspNetCore.Tests
         {
             return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume(), cancellationToken);
         }
-        
+
         private static Task<TResult> Result<TResult>(TResult value)
         {
             return Task.FromResult(value);
         }
 
-        #endregion
+        [Fact]
+        public void ShouldBeAbleToCreateADeadManSwitchRunner()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(b => b.AddSerilog())
+                .AddDeadManSwitch()
+                .BuildServiceProvider();
 
+            // Act
+            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
+
+            // Arrange
+            runner.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void ShouldBeAbleToCreateAnInfiniteDeadManSwitchRunner()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(b => b.AddSerilog())
+                .AddDeadManSwitch()
+                .BuildServiceProvider();
+
+            // Act
+            var runner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
+
+            // Arrange
+            runner.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task ShouldBeAbleToRunCreatedInfiniteRunner()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                // Arrange
+                var serviceProvider = new ServiceCollection()
+                    .AddLogging(b => b.AddSerilog())
+                    .AddDeadManSwitch()
+                    .BuildServiceProvider();
+
+                // Act
+                var runner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
+
+                double? pi = null;
+                var worker = InfiniteWorker(
+                    WorkItems(
+                        Work(
+                            Do(_ => pi = Math.PI),
+                            Notify("Test")
+                        ),
+                        Work(
+                            Do(_ => cts.Cancel())
+                        )
+                    )
+                );
+                await runner.RunAsync(worker, new DeadManSwitchOptions(), cts.Token).ConfigureAwait(false);
+
+                // Arrange
+                runner.Should().NotBeNull();
+                pi.Should().Be(Math.PI);
+            }
+        }
+
+        [Fact]
+        public async Task ShouldBeAbleToRunCreatedRunner()
+        {
+            // Arrange
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(b => b.AddSerilog())
+                .AddDeadManSwitch()
+                .BuildServiceProvider();
+
+            // Act
+            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
+
+            var worker = Worker(
+                Work(
+                    Notify("Test")
+                ),
+                Result(Math.PI)
+            );
+            var result = await runner.RunAsync(worker, new DeadManSwitchOptions(), CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Arrange
+            runner.Should().NotBeNull();
+            result.Should().Be(Math.PI);
+        }
     }
 }

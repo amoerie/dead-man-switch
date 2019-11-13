@@ -8,13 +8,13 @@ namespace DeadManSwitch.Examples.AspNetFramework
     public static class ExampleInfiniteProgram
     {
         /// <summary>
-        /// Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
+        ///     Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
         /// </summary>
         public static async Task Main()
         {
             // This example uses NLog, but it only requires a trivial amount of code to use any other logging library
             var loggerFactory = new NLoggerFactory();
-            
+
             var infiniteRunner = InfiniteDeadManSwitchRunner.Create(loggerFactory);
             var worker = new ExampleInfiniteWorker();
 

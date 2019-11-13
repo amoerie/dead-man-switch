@@ -13,9 +13,9 @@ namespace DeadManSwitch.Internal
     internal sealed class DeadManSwitchWatcher : IDeadManSwitchWatcher
     {
         private readonly IDeadManSwitchContext _context;
-        private readonly DeadManSwitchOptions _options;
         private readonly IDeadManSwitchTriggerer _deadManSwitchTriggerer;
         private readonly IDeadManSwitchLogger<DeadManSwitchWatcher> _logger;
+        private readonly DeadManSwitchOptions _options;
 
         public DeadManSwitchWatcher(IDeadManSwitchContext deadManSwitchContext,
             DeadManSwitchOptions deadManSwitchOptions,
@@ -29,9 +29,9 @@ namespace DeadManSwitch.Internal
         }
 
         /// <summary>
-        /// Starts a worker that watches the dead man's switch.
-        /// When no notifications are received within the proper timeout period, the <see cref="CancellationToken"/> will be cancelled automatically.
-        /// You should pass this cancellation token to any worker that must be cancelled.
+        ///     Starts a worker that watches the dead man's switch.
+        ///     When no notifications are received within the proper timeout period, the <see cref="CancellationToken" /> will be cancelled automatically.
+        ///     You should pass this cancellation token to any worker that must be cancelled.
         /// </summary>
         /// <returns>A value indicating whether the dead man's switch triggered or not</returns>
         public async Task WatchAsync(CancellationToken cancellationToken)
@@ -44,14 +44,15 @@ namespace DeadManSwitch.Internal
 
                 if (!_context.IsSuspended)
                 {
-                    timeSinceLastNotification = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - _context.LastNotifiedTicks); ;
+                    timeSinceLastNotification = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - _context.LastNotifiedTicks);
+                    ;
 
                     if (timeSinceLastNotification > _options.Timeout)
                     {
                         _deadManSwitchTriggerer.Trigger();
                         return;
                     }
-                } 
+                }
                 else
                 {
                     _logger.Debug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");

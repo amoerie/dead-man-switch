@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
@@ -33,11 +31,8 @@ namespace DeadManSwitch.Internal
 
             _logger.Warning("These were the last {NotificationCount} notifications: ", notifications.Length);
 
-            foreach (var notification in notifications)
-            {
-                _logger.Warning("{NotificationTimestamp} {NotificationContent}", notification.Timestamp, notification.Content);
-            }
-            
+            foreach (var notification in notifications) _logger.Warning("{NotificationTimestamp} {NotificationContent}", notification.Timestamp, notification.Content);
+
             _logger.Trace("Marking worker cancellation token as cancelled");
             _deadManSwitchContext.Cancel();
         }

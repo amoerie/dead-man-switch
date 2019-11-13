@@ -10,7 +10,7 @@ namespace DeadManSwitch.Examples.AspNetCore
     public static class ExampleInfiniteProgram
     {
         /// <summary>
-        /// Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
+        ///     Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
         /// </summary>
         public static async Task Main()
         {

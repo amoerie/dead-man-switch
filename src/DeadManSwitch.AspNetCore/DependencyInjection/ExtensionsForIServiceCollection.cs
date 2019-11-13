@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 namespace DeadManSwitch.AspNetCore.DependencyInjection
 {
     /// <summary>
-    /// Provides extensions for <see cref="IServiceCollection"/>
+    ///     Provides extensions for <see cref="IServiceCollection" />
     /// </summary>
     public static class ExtensionsForIServiceCollection
     {
         /// <summary>
-        /// Adds the dead man's switch to the provided <see cref="IServiceCollection"/>
+        ///     Adds the dead man's switch to the provided <see cref="IServiceCollection" />
         /// </summary>
         public static IServiceCollection AddDeadManSwitch(this IServiceCollection serviceCollection)
         {
