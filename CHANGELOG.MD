@@ -1,5 +1,9 @@
 # 💀 Changelog
 
+# 0.2.2 November 14th, 2019
+
+Add static API to simplify usage of this library
+
 # 0.2.1 November 12th, 2019
 
 Make DeadManSwitch.AspNetCore dependent on DeadManSwitch as a nuget package, not as a project reference

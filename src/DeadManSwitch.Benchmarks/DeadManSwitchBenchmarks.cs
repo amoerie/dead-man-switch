@@ -5,7 +5,8 @@ using BenchmarkDotNet.Attributes;
 
 namespace DeadManSwitch.Benchmarks
 {
-    [MemoryDiagnoser, ThreadingDiagnoser]
+    [MemoryDiagnoser]
+    [ThreadingDiagnoser]
     public class DeadManSwitchBenchmarks
     {
         private readonly DeadManSwitchOptions _deadManSwitchOptions;

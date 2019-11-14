@@ -1,27 +1,16 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using DeadManSwitch.AspNetCore.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace DeadManSwitch.Examples.AspNetCore
 {
     public static class ExampleInfiniteProgram
     {
         /// <summary>
-        /// Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
+        ///     Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
         /// </summary>
         public static async Task Main()
         {
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole())
-                .AddDeadManSwitch()
-                .BuildServiceProvider();
-
-            var infiniteRunner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
-            var worker = new ExampleInfiniteWorker();
-
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
                 var options = new DeadManSwitchOptions
@@ -29,7 +18,17 @@ namespace DeadManSwitch.Examples.AspNetCore
                     Timeout = TimeSpan.FromSeconds(60)
                 };
                 // do not await this, it will never complete until you cancel the token
-                var run = infiniteRunner.RunAsync(worker, options, cancellationTokenSource.Token);
+                var run = InfiniteDeadManSwitchTask.RunAsync(async (deadManSwitch, cancellationToken) =>
+                {
+                    deadManSwitch.Notify("Beginning work again");
+
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+
+                    deadManSwitch.Notify("Still busy, please don't cancel");
+
+                    await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
+
+                }, options, cancellationTokenSource.Token);
 
                 // let it run for 10s.
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token).ConfigureAwait(false);
@@ -40,6 +39,11 @@ namespace DeadManSwitch.Examples.AspNetCore
                 // let it finish gracefully
                 await run.ConfigureAwait(false);
             }
+        }
+
+        private static async Task DoSomethingUseful(CancellationToken cancellationToken)
+        {
+            await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
         }
     }
 }

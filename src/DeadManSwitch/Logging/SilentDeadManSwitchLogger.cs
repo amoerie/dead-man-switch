@@ -2,11 +2,10 @@
 
 namespace DeadManSwitch.Logging
 {
-    internal sealed class SilentDeadManSwitchLogger<T>: IDeadManSwitchLogger<T>
+    internal sealed class SilentDeadManSwitchLogger<T> : IDeadManSwitchLogger<T>
     {
         public void Trace(string message, params object[] args)
         {
-            
         }
 
         public void Debug(string message, params object[] args)

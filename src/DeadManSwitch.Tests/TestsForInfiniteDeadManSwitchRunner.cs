@@ -9,16 +9,12 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Xunit;
 using Xunit.Abstractions;
+using static DeadManSwitch.Tests.TestHelpers;
 
 namespace DeadManSwitch.Tests
 {
     public sealed class TestsForInfiniteDeadManSwitchRunner : IDisposable
     {
-        private readonly ILogger<TestsForInfiniteDeadManSwitchRunner> _logger;
-        private readonly InfiniteDeadManSwitchRunner _runner;
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly CapturingDeadManSwitchSessionFactory _sessionFactory;
-
         public TestsForInfiniteDeadManSwitchRunner(ITestOutputHelper testOutputHelper)
         {
             var logger = new LoggerConfiguration()
@@ -40,6 +36,105 @@ namespace DeadManSwitch.Tests
             _loggerFactory.Dispose();
         }
 
+        private readonly ILogger<TestsForInfiniteDeadManSwitchRunner> _logger;
+        private readonly InfiniteDeadManSwitchRunner _runner;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly CapturingDeadManSwitchSessionFactory _sessionFactory;
+
+        [Fact]
+        public async Task ShouldCancelTheTaskIfTheDeadManSwitchWasPausedAndResumedAndTheTaskTakesTooLong()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                // Arrange
+                double? pi = null, e = null;
+                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var workItems = WorkItems(
+                    Work(
+                        Pause(),
+                        Sleep(TimeSpan.FromSeconds(3)),
+                        Do(_ => pi = Math.PI),
+                        Resume(),
+                        Sleep(TimeSpan.FromSeconds(3)),
+                        Do(_ => e = Math.E)
+                    ),
+                    Work(
+                        Do(_ => _logger.LogInformation("Cancelling infinite worker")),
+                        Do(_ => cts.Cancel())
+                    )
+                );
+                var worker = InfiniteWorker(workItems);
+
+                // Act
+                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+
+                // Assert
+                pi.Should().NotBeNull();
+                e.Should().BeNull();
+            }
+        }
+
+        [Fact]
+        public async Task ShouldCancelTheTaskWhenTasksTimeOutAndWhenCancelling()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                // Arrange
+                double? pi = null;
+                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(3)};
+                var workItems = WorkItems(
+                    Work(
+                        Sleep(TimeSpan.FromSeconds(4)),
+                        Do(_ => pi = Math.PI)
+                    ),
+                    Work(
+                        Do(_ => _logger.LogInformation("Cancelling infinite worker")),
+                        Do(_ => cts.Cancel())
+                    )
+                );
+                var worker = InfiniteWorker(workItems);
+
+                // Act
+                var run = _runner.RunAsync(worker, options, cts.Token);
+                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
+                cts.Cancel();
+                await run.ConfigureAwait(false);
+
+                // Assert
+                pi.Should().BeNull();
+            }
+        }
+
+        [Fact]
+        public async Task ShouldCancelTheTaskWhenTokenIsCancelled()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                // Arrange
+                double? pi = null;
+                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5)};
+                var workItems = WorkItems(
+                    Work(
+                        Sleep(TimeSpan.FromSeconds(2)),
+                        Do(_ => pi = Math.PI)
+                    )
+                );
+                var worker = InfiniteWorker(workItems);
+
+                // Act
+                var run = _runner.RunAsync(worker, options, cts.Token);
+                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
+
+                _logger.LogInformation("Cancelling infinite worker");
+                cts.Cancel();
+
+                await run.ConfigureAwait(false);
+
+                // Assert
+                pi.Should().BeNull();
+            }
+        }
+
         [Fact]
         public async Task ShouldLetTaskFinishIfItCompletesImmediately()
         {
@@ -53,7 +148,7 @@ namespace DeadManSwitch.Tests
                     Do(_ => _logger.LogInformation("Cancelling infinite worker")),
                     Work(Do(_ => cts.Cancel()))
                 );
-                var worker = Worker(workItems);
+                var worker = InfiniteWorker(workItems);
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
@@ -64,72 +159,32 @@ namespace DeadManSwitch.Tests
         }
 
         [Fact]
-        public async Task ShouldRunTaskMultipleTimesUntilStopped()
-        {
-            using (var cts = new CancellationTokenSource())
-            {
-                // Arrange
-                List<double> pies = new List<double>();
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    WorkItems(
-                        Work(
-                            Do(_ => pies.Add(Math.PI))
-                        ),
-                        Work(
-                            Do(_ => pies.Add(Math.PI))),
-                        Work(
-                            Do(_ => pies.Add(Math.PI))
-                        ),
-                        Work(
-                            Do(_ => _logger.LogInformation("Cancelling infinite worker")),
-                            Do(_ => cts.Cancel())
-                        )
-                    ));
-
-                // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
-
-                // Assert
-                pies.Should().HaveCount(3);
-                pies.Should().AllBeEquivalentTo(Math.PI);
-            }
-        }
-
-        [Fact]
-        public async Task ShouldRunTaskAgainAfterStoppingItTheFirstTime()
+        public async Task ShouldNotCancelTheTaskIfTheDeadManSwitchIsPausedAndTheTaskTakesTooLong()
         {
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
                 double? pi = null;
-                double? e = null;
                 var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
                 var workItems = WorkItems(
                     Work(
-                        Notify("Going to sleep for 5 seconds"),
-                        Do(_ => _logger.LogInformation("In loop 1, this should be cancelled")),
-                        Sleep(TimeSpan.FromSeconds(5)),
-                        Do(_ => _logger.LogInformation("In loop 1, task was not aborted!!!")),
-                        Do(_ => e = Math.E)
+                        Pause(),
+                        Sleep(TimeSpan.FromSeconds(3)),
+                        Do(_ => pi = Math.PI),
+                        Resume()
                     ),
                     Work(
-                        Do(_ => _logger.LogInformation("In loop 2, assigning Math.PI")),
-                        Do(_ => pi = Math.PI)
-                    ),
-                    Work(
-                        Do(_ => _logger.LogInformation("In loop 3, stopping worker")),
+                        Do(_ => _logger.LogInformation("Cancelling infinite worker")),
                         Do(_ => cts.Cancel())
                     )
                 );
-                var worker = Worker(workItems);
+                var worker = InfiniteWorker(workItems);
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
 
                 // Assert
-                e.Should().BeNull();
-                pi.Should().Be(Math.PI);
+                pi.Should().NotBeNull();
             }
         }
 
@@ -160,7 +215,7 @@ namespace DeadManSwitch.Tests
                         Do(_ => cts.Cancel())
                     )
                 );
-                var worker = Worker(workItems);
+                var worker = InfiniteWorker(workItems);
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
@@ -172,186 +227,73 @@ namespace DeadManSwitch.Tests
         }
 
         [Fact]
-        public async Task ShouldCancelTheTaskWhenTokenIsCancelled()
+        public async Task ShouldRunTaskAgainAfterStoppingItTheFirstTime()
         {
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
                 double? pi = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5)};
-                var workItems = WorkItems(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(2)),
-                        Do(_ => pi = Math.PI)
-                    )
-                );
-                var worker = Worker(workItems);
-
-                // Act
-                var run = _runner.RunAsync(worker, options, cts.Token);
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
-
-                _logger.LogInformation("Cancelling infinite worker");
-                cts.Cancel();
-
-                await run.ConfigureAwait(false);
-
-                // Assert
-                pi.Should().BeNull();
-            }
-        }
-
-        [Fact]
-        public async Task ShouldCancelTheTaskWhenTasksTimeOutAndWhenCancelling()
-        {
-            using (var cts = new CancellationTokenSource())
-            {
-                // Arrange
-                double? pi = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(3)};
-                var workItems = WorkItems(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(4)),
-                        Do(_ => pi = Math.PI)
-                    ),
-                    Work(
-                        Do(_ => _logger.LogInformation("Cancelling infinite worker")),
-                        Do(_ => cts.Cancel())
-                    )
-                );
-                var worker = Worker(workItems);
-
-                // Act
-                var run = _runner.RunAsync(worker, options, cts.Token);
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
-                cts.Cancel();
-                await run.ConfigureAwait(false);
-
-                // Assert
-                pi.Should().BeNull();
-            }
-        }
-
-        [Fact]
-        public async Task ShouldNotCancelTheTaskIfTheDeadManSwitchIsPausedAndTheTaskTakesTooLong()
-        {
-            using (var cts = new CancellationTokenSource())
-            {
-                // Arrange
-                double? pi = null;
+                double? e = null;
                 var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
                 var workItems = WorkItems(
                     Work(
-                        Pause(),
-                        Sleep(TimeSpan.FromSeconds(3)),
-                        Do(_ => pi = Math.PI),
-                        Resume()
-                    ),
-                    Work(
-                        Do(_ => _logger.LogInformation("Cancelling infinite worker")),
-                        Do(_ => cts.Cancel())
-                    )
-                );
-                var worker = new ConfigurableDeadManSwitchInfiniteWorker(workItems);
-
-                // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
-
-                // Assert
-                pi.Should().NotBeNull();
-            }
-        }
-
-        [Fact]
-        public async Task ShouldCancelTheTaskIfTheDeadManSwitchWasPausedAndResumedAndTheTaskTakesTooLong()
-        {
-            using (var cts = new CancellationTokenSource())
-            {
-                // Arrange
-                double? pi = null, e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var workItems = WorkItems(
-                    Work(
-                        Pause(),
-                        Sleep(TimeSpan.FromSeconds(3)),
-                        Do(_ => pi = Math.PI),
-                        Resume(),
-                        Sleep(TimeSpan.FromSeconds(3)),
+                        Notify("Going to sleep for 5 seconds"),
+                        Do(_ => _logger.LogInformation("In loop 1, this should be cancelled")),
+                        Sleep(TimeSpan.FromSeconds(5)),
+                        Do(_ => _logger.LogInformation("In loop 1, task was not aborted!!!")),
                         Do(_ => e = Math.E)
                     ),
                     Work(
-                        Do(_ => _logger.LogInformation("Cancelling infinite worker")),
+                        Do(_ => _logger.LogInformation("In loop 2, assigning Math.PI")),
+                        Do(_ => pi = Math.PI)
+                    ),
+                    Work(
+                        Do(_ => _logger.LogInformation("In loop 3, stopping worker")),
                         Do(_ => cts.Cancel())
                     )
                 );
-                var worker = new ConfigurableDeadManSwitchInfiniteWorker(workItems);
+                var worker = InfiniteWorker(workItems);
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
 
                 // Assert
-                pi.Should().NotBeNull();
                 e.Should().BeNull();
+                pi.Should().Be(Math.PI);
             }
         }
 
-        #region helper methods
-
-        private static IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> WorkItems(params Func<IDeadManSwitch, CancellationToken, Task>[] workItems)
+        [Fact]
+        public async Task ShouldRunTaskMultipleTimesUntilStopped()
         {
-            return workItems;
-        }
-
-        private static Func<IDeadManSwitch, CancellationToken, Task> Work(params Func<IDeadManSwitch, CancellationToken, Task>[] workItems)
-        {
-            return async (deadManSwitch, cancellationToken) =>
+            using (var cts = new CancellationTokenSource())
             {
-                if (cancellationToken.IsCancellationRequested)
-                    throw new OperationCanceledException(cancellationToken);
-                foreach (var task in workItems)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        throw new OperationCanceledException(cancellationToken);
+                // Arrange
+                var pies = new List<double>();
+                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var worker = InfiniteWorker(
+                    WorkItems(
+                        Work(
+                            Do(_ => pies.Add(Math.PI))
+                        ),
+                        Work(
+                            Do(_ => pies.Add(Math.PI))),
+                        Work(
+                            Do(_ => pies.Add(Math.PI))
+                        ),
+                        Work(
+                            Do(_ => _logger.LogInformation("Cancelling infinite worker")),
+                            Do(_ => cts.Cancel())
+                        )
+                    ));
 
-                    await task(deadManSwitch, cancellationToken).ConfigureAwait(false);
-                }
-            };
+                // Act
+                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+
+                // Assert
+                pies.Should().HaveCount(3);
+                pies.Should().AllBeEquivalentTo(Math.PI);
+            }
         }
-
-        private static ConfigurableDeadManSwitchInfiniteWorker Worker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> workItems)
-        {
-            return new ConfigurableDeadManSwitchInfiniteWorker(workItems);
-        }
-
-        private static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
-        {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification));
-        }
-
-        private static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
-        {
-            return async (deadManSwitch, cancellationToken) => { await Task.Delay(duration, cancellationToken).ConfigureAwait(false); };
-        }
-
-        private static Func<IDeadManSwitch, CancellationToken, Task> Do(Action<IDeadManSwitch> action)
-        {
-            return (deadManSwitch, cancellationToken) =>
-            {
-                action(deadManSwitch);
-                return Task.CompletedTask;
-            };
-        }
-
-        private static Func<IDeadManSwitch, CancellationToken, Task> Pause()
-        {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Suspend());
-        }
-
-        private static Func<IDeadManSwitch, CancellationToken, Task> Resume()
-        {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume());
-        }
-
-        #endregion
     }
 }

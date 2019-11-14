@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace DeadManSwitch.Tests.Logging
 {
     /// <summary>
-    /// Thin wrapper around <see cref="ILogger{TCategoryName}"/>
+    ///     Thin wrapper around <see cref="ILogger{TCategoryName}" />
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class TestLogger<T> : IDeadManSwitchLogger<T>
@@ -13,7 +13,7 @@ namespace DeadManSwitch.Tests.Logging
         private readonly ILogger<T> _logger;
 
         /// <summary>
-        /// Creates a new instance of <see cref="DeadManSwitchLogger{T}"/>
+        ///     Creates a new instance of <see cref="DeadManSwitchLogger{T}" />
         /// </summary>
         public TestLogger(ILogger<T> logger)
         {

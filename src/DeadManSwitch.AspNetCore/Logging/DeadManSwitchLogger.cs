@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace DeadManSwitch.AspNetCore.Logging
 {
     /// <summary>
-    /// Thin wrapper around <see cref="ILogger{TCategoryName}"/>
+    ///     Thin wrapper around <see cref="ILogger{TCategoryName}" />
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class DeadManSwitchLogger<T> : IDeadManSwitchLogger<T>
@@ -13,7 +13,7 @@ namespace DeadManSwitch.AspNetCore.Logging
         private readonly ILogger<T> _logger;
 
         /// <summary>
-        /// Creates a new instance of <see cref="DeadManSwitchLogger{T}"/>
+        ///     Creates a new instance of <see cref="DeadManSwitchLogger{T}" />
         /// </summary>
         public DeadManSwitchLogger(ILogger<T> logger)
         {
