@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DeadManSwitch.Examples.AspNetCore
 {
-    public static class ExampleProgramUsingStaticAPI
+    public static class ExampleProgram
     {
         /// <summary>
         ///     Demonstrates how you can run a worker once, using a dead man's switch

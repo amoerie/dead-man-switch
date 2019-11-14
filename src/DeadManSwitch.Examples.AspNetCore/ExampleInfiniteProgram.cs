@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace DeadManSwitch.Examples.AspNetCore
 {
-    public static class ExampleInfiniteProgramUsingStaticAPI
+    public static class ExampleInfiniteProgram
     {
         /// <summary>
         ///     Demonstrates how to run (and stop) an infinite worker, using a dead man's switch
@@ -26,11 +26,8 @@ namespace DeadManSwitch.Examples.AspNetCore
 
                     deadManSwitch.Notify("Still busy, please don't cancel");
 
-                    // tell the dead man's switch to stop the clock
-                    deadManSwitch.Suspend();
+                    await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
 
-                    // tell the dead man's switch to resume the clock
-                    deadManSwitch.Resume();
                 }, options, cancellationTokenSource.Token);
 
                 // let it run for 10s.
@@ -42,6 +39,11 @@ namespace DeadManSwitch.Examples.AspNetCore
                 // let it finish gracefully
                 await run.ConfigureAwait(false);
             }
+        }
+
+        private static async Task DoSomethingUseful(CancellationToken cancellationToken)
+        {
+            await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
         }
     }
 }

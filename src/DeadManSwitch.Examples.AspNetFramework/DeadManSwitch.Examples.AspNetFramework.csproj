@@ -61,7 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExampleInfiniteProgram.cs" />
+    <Compile Include="ExampleInfiniteProgramUsingDependencyInjection.cs" />
     <Compile Include="ExampleProgram.cs" />
+    <Compile Include="ExampleProgramUsingDependencyInjection.cs" />
     <Compile Include="Logging\NLogger.cs" />
     <Compile Include="Logging\NLoggerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
