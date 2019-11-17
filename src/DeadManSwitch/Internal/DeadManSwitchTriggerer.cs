@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DeadManSwitch.Logging;
 
 namespace DeadManSwitch.Internal
@@ -29,22 +27,14 @@ namespace DeadManSwitch.Internal
             _logger.Warning("The worker task did not notify the dead man's switch within the agreed timeout of {TimeoutInSeconds}s " +
                             "and will be cancelled.", _deadManSwitchOptions.Timeout.TotalSeconds);
 
-            var notifications = _deadManSwitchContext.GetNotifications();
+            var notifications = _deadManSwitchContext.Notifications.ToArray();
 
-            _logger.Warning("These were the last {NotificationCount} notifications: ", notifications.Count);
+            _logger.Warning("These were the last {NotificationCount} notifications: ", notifications.Length);
 
-            foreach (var notification in notifications)
-            {
-                _logger.Warning("{NotificationTimestamp} {NotificationContent}", notification.Timestamp, notification.Content);
-            }
-
-            var cancellationTokenSource = _deadManSwitchContext.CancellationTokenSource;
-
-            _deadManSwitchContext.CancellationTokenSource = new CancellationTokenSource();
+            foreach (var notification in notifications) _logger.Warning("{NotificationTimestamp} {NotificationContent}", notification.Timestamp, notification.Content);
 
             _logger.Trace("Marking worker cancellation token as cancelled");
-            cancellationTokenSource.Cancel();
-            cancellationTokenSource.Dispose();
+            _deadManSwitchContext.Cancel();
         }
     }
 }

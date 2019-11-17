@@ -1,11 +1,11 @@
 ﻿using System;
 using DeadManSwitch.Logging;
-using Logger = NLog.Logger;
+using NLog;
 
 namespace DeadManSwitch.Examples.AspNetFramework.Logging
 {
     /// <summary>
-    /// Thin wrapper around NLog.Logger 
+    ///     Thin wrapper around NLog.Logger
     /// </summary>
     public class NLogger<T> : IDeadManSwitchLogger<T>
     {

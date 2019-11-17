@@ -4,7 +4,7 @@ using NLog;
 namespace DeadManSwitch.Examples.AspNetFramework.Logging
 {
     /// <summary>
-    /// Thin wrapper around NLog.LogManager
+    ///     Thin wrapper around NLog.LogManager
     /// </summary>
     public class NLoggerFactory : IDeadManSwitchLoggerFactory
     {
