@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-2019, ubuntu-18.04, macOS-latest]
-        dotnet-version: [3.1.2]
+        dotnet-version: [2.2.108]
 
     steps:
     - uses: actions/checkout@v1
@@ -23,12 +23,36 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
+        
+    - name: Setup Nuget.exe
+      uses: warrenbuckley/Setup-Nuget@v1
+      if: matrix.os == 'windows-2019'
       
-    - name: Build HtmlBuilders
-      run: dotnet build ./src/HtmlBuilders/HtmlBuilders.csproj --configuration Release
+    - name: Restore NuGet packages
+      run: nuget restore ./src/DeadManSwitch.sln
+      if: matrix.os == 'windows-2019'
       
-    - name: Build HtmlBuilders.Tests
-      run: dotnet build ./src/HtmlBuilders.Tests/HtmlBuilders.Tests.csproj --configuration Release
+    - name: Build DeadManSwitch
+      run: dotnet build ./src/DeadManSwitch/DeadManSwitch.csproj --configuration Release
+      
+    - name: Build DeadManSwitch.AspNetCore
+      run: dotnet build ./src/DeadManSwitch.AspNetCore/DeadManSwitch.AspNetCore.csproj --configuration Release
     
-    - name: Run DeadManSwitch.Tests
-      run: dotnet test ./src/HtmlBuilders.Tests/HtmlBuilders.Tests.csproj --configuration Release
+    - name: Build DeadManSwitch.Examples.AspNetCore
+      run: dotnet build ./src/DeadManSwitch.Examples.AspNetCore/DeadManSwitch.Examples.AspNetCore.csproj --configuration Release
+    
+    - name: Build DeadManSwitch.Examples.AspNetFramework
+      run: |
+           cd "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
+           .\MSBuild.exe $Env:GITHUB_WORKSPACE/src/DeadManSwitch.Examples.AspNetFramework/DeadManSwitch.Examples.AspNetFramework.csproj -target:Build -property:Configuration=Release
+      if: matrix.os == 'windows-2019'
+    
+    - name: Run DeadManSwitch.Tests on .NET Core
+      run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework netcoreapp2.1
+    
+    - name: Run DeadManSwitch.Tests on .NET Framework
+      run: dotnet test ./src/DeadManSwitch.Tests/DeadManSwitch.Tests.csproj --configuration Release --framework net48
+      if: matrix.os == 'windows-2019'
+    
+    - name: Run DeadManSwitch.AspNetCore.Tests
+      run: dotnet test ./src/DeadManSwitch.AspNetCore.Tests/DeadManSwitch.AspNetCore.Tests.csproj --configuration Release --framework netcoreapp2.1
