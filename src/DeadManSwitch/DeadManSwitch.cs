@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Threading.Tasks;
 using DeadManSwitch.Internal;
 using DeadManSwitch.Logging;
 
 namespace DeadManSwitch
 {
     /// <summary>
-    /// According to Wikipedia, a dead man's switch is a switch that is designed to be activated or deactivated if the human operator becomes incapacitated,
-    /// such as through death, loss of consciousness, or being bodily removed from control.
-    /// Originally applied to switches on a vehicle or machine, it has since come to be used to describe other intangible uses like in computer software.
+    ///     According to Wikipedia, a dead man's switch is a switch that is designed to be activated or deactivated if the human operator becomes incapacitated,
+    ///     such as through death, loss of consciousness, or being bodily removed from control.
+    ///     Originally applied to switches on a vehicle or machine, it has since come to be used to describe other intangible uses like in computer software.
     /// </summary>
-    public interface IDeadManSwitch 
+    public interface IDeadManSwitch
     {
         /// <summary>
-        /// Notifies the dead man's switch, postponing the cancellation of the worker
+        ///     Notifies the dead man's switch, postponing the cancellation of the worker
         /// </summary>
         /// <param name="notification">
-        /// A notification message that will be shown when the worker worker is cancelled.
-        /// This can be useful to retrace the last steps of the worker worker.
+        ///     A notification message that will be shown when the worker worker is cancelled.
+        ///     This can be useful to retrace the last steps of the worker worker.
         /// </param>
         void Notify(string notification);
 
         /// <summary>
-        /// Pauses the dead man's switch. The worker worker cannot be cancelled until the dead man's switch is resumed.
+        ///     Pauses the dead man's switch. The worker worker cannot be cancelled until the dead man's switch is resumed.
         /// </summary>
         void Suspend();
 
         /// <summary>
-        /// Resumes the dead man's switch after pausing it.
+        ///     Resumes the dead man's switch after pausing it.
         /// </summary>
         [SuppressMessage("Naming", "CA1716", Justification = "Resume is the logical counterpart to Suspend")]
         void Resume();
@@ -43,7 +41,7 @@ namespace DeadManSwitch
         private readonly IDeadManSwitchLogger<DeadManSwitch> _logger;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="DeadManSwitch"/>
+        ///     Initializes a new instance of <see cref="DeadManSwitch" />
         /// </summary>
         /// <param name="context"></param>
         /// <param name="logger"></param>

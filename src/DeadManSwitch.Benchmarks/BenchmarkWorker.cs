@@ -14,7 +14,7 @@ namespace DeadManSwitch.Benchmarks
             if (deadManSwitch == null)
                 throw new ArgumentNullException(nameof(deadManSwitch));
 
-            for (int i = 0; i < 100; i++)
+            for (var i = 0; i < 100; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 deadManSwitch.Notify("Working " + i);

@@ -32,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeadManSwitch, Version=0.2.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DeadManSwitch.0.2.0\lib\netstandard2.0\DeadManSwitch.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c">
       <HintPath>..\packages\NLog.4.6.7\lib\net45\NLog.dll</HintPath>
@@ -65,15 +61,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExampleInfiniteProgram.cs" />
-    <Compile Include="ExampleInfiniteWorker.cs" />
+    <Compile Include="ExampleInfiniteProgramUsingDependencyInjection.cs" />
     <Compile Include="ExampleProgram.cs" />
-    <Compile Include="ExampleWorker.cs" />
+    <Compile Include="ExampleProgramUsingDependencyInjection.cs" />
     <Compile Include="Logging\NLogger.cs" />
     <Compile Include="Logging\NLoggerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj">
+      <Project>{67a74b2c-ff60-42a6-a7bf-e6cf9f4e6c28}</Project>
+      <Name>DeadManSwitch</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

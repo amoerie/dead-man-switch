@@ -8,13 +8,9 @@ namespace DeadManSwitch.Internal
         IDeadManSwitch DeadManSwitch { get; }
         IDeadManSwitchWatcher DeadManSwitchWatcher { get; }
     }
-    
-    internal sealed class DeadManSwitchSession : IDeadManSwitchSession 
-    {
-        public IDeadManSwitchContext DeadManSwitchContext { get; }
-        public IDeadManSwitch DeadManSwitch { get; }
-        public IDeadManSwitchWatcher DeadManSwitchWatcher { get; }
 
+    internal sealed class DeadManSwitchSession : IDeadManSwitchSession
+    {
         public DeadManSwitchSession(
             IDeadManSwitchContext deadManSwitchContext,
             IDeadManSwitch deadManSwitch,
@@ -24,6 +20,10 @@ namespace DeadManSwitch.Internal
             DeadManSwitch = deadManSwitch ?? throw new ArgumentNullException(nameof(deadManSwitch));
             DeadManSwitchWatcher = deadManSwitchWatcher ?? throw new ArgumentNullException(nameof(deadManSwitchWatcher));
         }
+
+        public IDeadManSwitchContext DeadManSwitchContext { get; }
+        public IDeadManSwitch DeadManSwitch { get; }
+        public IDeadManSwitchWatcher DeadManSwitchWatcher { get; }
 
         public void Dispose()
         {
