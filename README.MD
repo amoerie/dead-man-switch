@@ -1,7 +1,7 @@
 # 💀 The Dead Man's Switch
 
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Famoerie%2Fdead-man-switch%2Fbadge%3Fref%3Dmaster&style=for-the-badge&label=Build)](https://actions-badge.atrox.dev/amoerie/dead-man-switch/goto?ref=master) 
-![Codecov](https://img.shields.io/codecov/c/github/amoerie/dead-man-switch?label=Coverage&logo=codecov&style=for-the-badge)
+[![Codecov](https://img.shields.io/codecov/c/github/amoerie/dead-man-switch?label=Coverage&logo=codecov&style=for-the-badge)](https://app.codecov.io/gh/amoerie/dead-man-switch)
 [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch?label=DeadManSwitch&style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/DeadManSwitch) 
 [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch.AspNetCore?label=DeadManSwitch.AspNetCore&style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/DeadManSwitch.AspNetCore)
 
