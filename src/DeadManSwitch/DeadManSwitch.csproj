@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <LangVersion>7.3</LangVersion>
         <Title>Dead Man's Switch</Title>
         <Authors>Alexander Moerman</Authors>
         <PackageProjectUrl>https://github.com/amoerie/dead-man-switch</PackageProjectUrl>
