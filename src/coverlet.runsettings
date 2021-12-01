@@ -6,7 +6,7 @@
             <DataCollector friendlyName="XPlat code coverage">
                 <Configuration>
                     <Format>cobertura</Format>
-                    <Include>[DeadManSwitch.*]*</Include>
+                    <Include>[DeadManSwitch*]*</Include>
                     <Exclude>[*.Tests]*</Exclude>
                     <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
                     <IncludeTestAssembly>false</IncludeTestAssembly>
