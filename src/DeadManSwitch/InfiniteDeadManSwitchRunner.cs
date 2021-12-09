@@ -50,19 +50,21 @@ namespace DeadManSwitch
             using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options))
             using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
+                var watcherToken = watcherCTS.Token;
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
                 var deadManSwitchContext = deadManSwitchSession.DeadManSwitchContext;
-                var watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning,
+                var watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherToken), CancellationToken.None, TaskCreationOptions.LongRunning,
                     TaskScheduler.Default);
                 var iteration = 1;
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchContext.CancellationToken))
                     {
+                        var workerToken = workerCTS.Token;
                         _logger.Trace("Beginning work iteration {Iteration} of infinite worker {WorkerName} using a dead man's switch", iteration, worker.Name);
 
-                        var workerTask = Task.Run(() => worker.WorkAsync(deadManSwitch, workerCTS.Token), CancellationToken.None);
+                        var workerTask = Task.Run(() => worker.WorkAsync(deadManSwitch, workerToken), CancellationToken.None);
 
                         try
                         {
@@ -81,7 +83,7 @@ namespace DeadManSwitch
 
                             deadManSwitch.Notify("Worker task was canceled");
 
-                            watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherCTS.Token), CancellationToken.None, TaskCreationOptions.LongRunning,
+                            watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherToken), CancellationToken.None, TaskCreationOptions.LongRunning,
                                 TaskScheduler.Default);
                         }
                     }
