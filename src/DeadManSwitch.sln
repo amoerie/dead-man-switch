@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		coverlet.runsettings = coverlet.runsettings
 		..\README.MD = ..\README.MD
+		..\publish.ps1 = ..\publish.ps1
+		..\CHANGELOG.MD = ..\CHANGELOG.MD
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.AspNetCore", "DeadManSwitch.AspNetCore\DeadManSwitch.AspNetCore.csproj", "{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}"

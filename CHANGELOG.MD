@@ -1,5 +1,13 @@
 # 💀 Changelog
 
+## 1.0.1 June 23d, 2022
+
+Internal updates and some more conservative cancellation token usage
+
+## 1.0.0 November 10th, 2020
+
+We're stable! This library has been stable for a while now, so there's no sense in using alpha version numbers anymore.
+
 ## 0.2.2 November 14th, 2019
 
 Add static API to simplify usage of this library
