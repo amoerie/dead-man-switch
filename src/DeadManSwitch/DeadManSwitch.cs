@@ -22,7 +22,7 @@ namespace DeadManSwitch
         void Notify(string notification);
 
         /// <summary>
-        ///     Pauses the dead man's switch. The worker worker cannot be cancelled until the dead man's switch is resumed.
+        ///     Pauses the dead man's switch. The worker cannot be cancelled until the dead man's switch is resumed.
         /// </summary>
         void Suspend();
 
