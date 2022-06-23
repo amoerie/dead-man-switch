@@ -50,28 +50,30 @@ namespace DeadManSwitch
         {
             if (worker == null) throw new ArgumentNullException(nameof(worker));
 
-            using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options))
-            using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
-            using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationToken))
+            using var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options);
+            using var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            using var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationToken);
+            
+            var watcherToken = watcherCTS.Token;
+            var workerToken = workerCTS.Token;
+            
+            _logger.Trace("Running worker {WorkerName} using a dead man's switch", worker.Name);
+
+            var deadManSwitch = deadManSwitchSession.DeadManSwitch;
+            var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
+
+            var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerToken).ConfigureAwait(false), CancellationToken.None);
+            var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherToken).ConfigureAwait(false), CancellationToken.None);
+
+            var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
+            if (task == workerTask)
             {
-                _logger.Trace("Running worker {WorkerName} using a dead man's switch", worker.Name);
-
-                var deadManSwitch = deadManSwitchSession.DeadManSwitch;
-                var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
-
-                var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerCTS.Token).ConfigureAwait(false), CancellationToken.None);
-                var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherCTS.Token).ConfigureAwait(false), CancellationToken.None);
-
-                var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
-                if (task == workerTask)
-                {
-                    watcherCTS.Cancel();
-                    return await workerTask.ConfigureAwait(false);
-                }
-
-                workerCTS.Cancel();
-                throw new OperationCanceledException(workerCTS.Token);
+                watcherCTS.Cancel();
+                return await workerTask.ConfigureAwait(false);
             }
+
+            workerCTS.Cancel();
+            throw new OperationCanceledException(workerToken);
         }
 
         /// <summary>
