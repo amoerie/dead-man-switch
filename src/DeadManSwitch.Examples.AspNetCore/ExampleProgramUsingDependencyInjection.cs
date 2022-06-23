@@ -6,77 +6,75 @@ using DeadManSwitch.AspNetCore.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace DeadManSwitch.Examples.AspNetCore
+namespace DeadManSwitch.Examples.AspNetCore;
+
+public static class ExampleProgramUsingDependencyInjection
 {
-    public static class ExampleProgramUsingDependencyInjection
+    /// <summary>
+    ///     Demonstrates how you can run a worker once, using a dead man's switch
+    /// </summary>
+    public static async Task Main()
     {
-        /// <summary>
-        ///     Demonstrates how you can run a worker once, using a dead man's switch
-        /// </summary>
-        public static async Task Main()
+        var serviceProvider = new ServiceCollection()
+            .AddLogging(builder => builder.AddConsole())
+            .AddDeadManSwitch()
+            .BuildServiceProvider();
+        var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
+
+        var worker = new ExampleWorker();
+
+        using var cancellationTokenSource = new CancellationTokenSource();
+            
+        var options = new DeadManSwitchOptions
         {
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole())
-                .AddDeadManSwitch()
-                .BuildServiceProvider();
-            var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
+            Timeout = TimeSpan.FromSeconds(60)
+        };
+        var run = runner.RunAsync(worker, options, cancellationTokenSource.Token);
 
-            var worker = new ExampleWorker();
+        // if you want to cancel at some point: cancellationTokenSource.Cancel();
 
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                var options = new DeadManSwitchOptions
-                {
-                    Timeout = TimeSpan.FromSeconds(60)
-                };
-                var run = runner.RunAsync(worker, options, cancellationTokenSource.Token);
+        var result = await run.ConfigureAwait(false);
 
-                // if you want to cancel at some point: cancellationTokenSource.Cancel();
-
-                var result = await run.ConfigureAwait(false);
-
-                Debug.Assert(result.Equals(Math.PI));
-            }
-        }
+        Debug.Assert(result.Equals(Math.PI));
     }
+}
     
-    public class ExampleWorker : IDeadManSwitchWorker<double>
+public class ExampleWorker : IDeadManSwitchWorker<double>
+{
+    // for diagnostic purposes
+    public string Name => "Example one time worker";
+
+    public async Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
     {
-        // for diagnostic purposes
-        public string Name => "Example one time worker";
+        if (deadManSwitch == null)
+            throw new ArgumentNullException(nameof(deadManSwitch));
 
-        public async Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
-        {
-            if (deadManSwitch == null)
-                throw new ArgumentNullException(nameof(deadManSwitch));
+        deadManSwitch.Notify("Beginning work");
 
-            deadManSwitch.Notify("Beginning work");
+        await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+        deadManSwitch.Notify("Still busy, please don't cancel");
 
-            deadManSwitch.Notify("Still busy, please don't cancel");
+        await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
 
-            await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
+        // tell the dead man's switch to stop the clock
+        deadManSwitch.Suspend();
 
-            // tell the dead man's switch to stop the clock
-            deadManSwitch.Suspend();
+        await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
 
-            await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
+        // tell the dead man's switch to resume the clock
+        deadManSwitch.Resume();
 
-            // tell the dead man's switch to resume the clock
-            deadManSwitch.Resume();
+        return Math.PI;
+    }
 
-            return Math.PI;
-        }
+    private async Task DoSomethingUseful(CancellationToken cancellationToken)
+    {
+        await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+    }
 
-        private async Task DoSomethingUseful(CancellationToken cancellationToken)
-        {
-            await Task.Delay(100, cancellationToken).ConfigureAwait(false);
-        }
-
-        private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(CancellationToken cancellationToken)
-        {
-            await Task.Delay(100000, cancellationToken).ConfigureAwait(false);
-        }
+    private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(CancellationToken cancellationToken)
+    {
+        await Task.Delay(100000, cancellationToken).ConfigureAwait(false);
     }
 }
