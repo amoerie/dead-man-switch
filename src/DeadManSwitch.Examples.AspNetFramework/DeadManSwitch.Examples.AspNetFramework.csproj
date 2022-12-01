@@ -17,6 +17,6 @@
     <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.0.5" />
+    <PackageReference Include="NLog" Version="5.1.0" />
   </ItemGroup>
 </Project>
