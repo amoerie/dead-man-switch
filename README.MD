@@ -1,6 +1,6 @@
 # 💀 The Dead Man's Switch
 
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Famoerie%2Fdead-man-switch%2Fbadge%3Fref%3Dmaster&style=for-the-badge&label=Build)](https://actions-badge.atrox.dev/amoerie/dead-man-switch/goto?ref=master) 
+[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Famoerie%2Fdead-man-switch%2Fbadge%3Fref%3Dmain&style=for-the-badge&label=Build)](https://actions-badge.atrox.dev/amoerie/dead-man-switch/goto?ref=main) 
 [![Codecov](https://img.shields.io/codecov/c/github/amoerie/dead-man-switch?label=Coverage&logo=codecov&style=for-the-badge)](https://app.codecov.io/gh/amoerie/dead-man-switch)
 [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch?label=DeadManSwitch&style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/DeadManSwitch) 
 [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/DeadManSwitch.AspNetCore?label=DeadManSwitch.AspNetCore&style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/DeadManSwitch.AspNetCore)
@@ -112,8 +112,8 @@ public static class ExampleInfiniteProgram
 
 For more examples, including ones that use dependency injection and allow you to hook into the logging infrastructure, see the following links:
 
-- [Examples for .NET Core](https://github.com/amoerie/dead-man-switch/tree/master/src/DeadManSwitch.Examples.AspNetCore)
-- [Examples for .NET Framework](https://github.com/amoerie/dead-man-switch/tree/master/src/DeadManSwitch.Examples.AspNetFramework)
+- [Examples for .NET Core](https://github.com/amoerie/dead-man-switch/tree/main/src/DeadManSwitch.Examples.AspNetCore)
+- [Examples for .NET Framework](https://github.com/amoerie/dead-man-switch/tree/main/src/DeadManSwitch.Examples.AspNetFramework)
 
 # NuGet
 
@@ -122,8 +122,8 @@ For more examples, including ones that use dependency injection and allow you to
 
 # Changelog 
 
-See the [CHANGELOG.MD](https://github.com/amoerie/dead-man-switch/tree/master/CHANGELOG.MD) file
+See the [CHANGELOG.MD](https://github.com/amoerie/dead-man-switch/tree/main/CHANGELOG.MD) file
 
 # Contributors 
 
-See the [CONTRIBUTORS.MD](https://github.com/amoerie/dead-man-switch/tree/master/CONTRIBUTORS.MD) file
+See the [CONTRIBUTORS.MD](https://github.com/amoerie/dead-man-switch/tree/main/CONTRIBUTORS.MD) file

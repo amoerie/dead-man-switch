@@ -15,7 +15,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>icon.png</PackageIcon>
     <PackageTags>tasks, cancellation, workers</PackageTags>
-    <PackageReleaseNotes>See https://github.com/amoerie/dead-man-switch/blob/master/CHANGELOG.MD</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/amoerie/dead-man-switch/blob/main/CHANGELOG.MD</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
