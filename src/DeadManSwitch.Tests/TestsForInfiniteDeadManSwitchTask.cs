@@ -27,7 +27,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                await InfiniteDeadManSwitchTask.RunAsync(worker, DeadManSwitchOptions.Default, cts.Token).ConfigureAwait(false);
+                await InfiniteDeadManSwitchTask.RunAsync(worker, DeadManSwitchOptions.Default, cts.Token);
 
                 // Arrange
                 pi.Should().Be(Math.PI);

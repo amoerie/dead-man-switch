@@ -57,14 +57,14 @@ namespace DeadManSwitch.Tests
                                 .AsParallel()
                                 .WithDegreeOfParallelism(100)
                                 .Select(i => Task.Run(() => deadManSwitch.Notify("Notification " + i)));
-                            await Task.WhenAll(sendNotifications).ConfigureAwait(false);
+                            await Task.WhenAll(sendNotifications);
                         }
                     ),
                     Result(Math.PI)
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -98,7 +98,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
 
                 // Assert
                 e.Should().BeNull();
@@ -124,7 +124,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -144,7 +144,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -163,7 +163,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
 
                 // Arrange
                 worker = Worker(
@@ -175,7 +175,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -198,7 +198,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
 
                 // Arrange
                 worker = Worker(
@@ -215,7 +215,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -237,7 +237,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -258,11 +258,11 @@ namespace DeadManSwitch.Tests
                 // Act
                 var runTask = _runner.RunAsync(worker, options, cts.Token);
 
-                await Task.Delay(TimeSpan.FromSeconds(0.5)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(0.5));
 
                 cts.Cancel();
 
-                await runTask.Invoking(async task => await task.ConfigureAwait(false)).Should().ThrowAsync<OperationCanceledException>().ConfigureAwait(false);
+                await runTask.Invoking(async task => await task).Should().ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -282,7 +282,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -307,7 +307,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -343,7 +343,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -371,7 +371,7 @@ namespace DeadManSwitch.Tests
                 var options = new DeadManSwitchOptions {Timeout = timeout};
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -393,7 +393,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -421,7 +421,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -444,7 +444,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -466,7 +466,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -498,7 +498,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -522,7 +522,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);
@@ -548,7 +548,7 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                var result = await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                var result = await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 result.Should().Be(Math.PI);

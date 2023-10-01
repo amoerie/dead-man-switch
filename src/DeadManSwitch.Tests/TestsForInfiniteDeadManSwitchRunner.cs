@@ -66,7 +66,7 @@ namespace DeadManSwitch.Tests
                 var worker = InfiniteWorker(workItems);
 
                 // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 pi.Should().NotBeNull();
@@ -96,9 +96,9 @@ namespace DeadManSwitch.Tests
 
                 // Act
                 var run = _runner.RunAsync(worker, options, cts.Token);
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
                 cts.Cancel();
-                await run.ConfigureAwait(false);
+                await run;
 
                 // Assert
                 pi.Should().BeNull();
@@ -123,12 +123,12 @@ namespace DeadManSwitch.Tests
 
                 // Act
                 var run = _runner.RunAsync(worker, options, cts.Token);
-                await Task.Delay(TimeSpan.FromMilliseconds(10)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
 
                 _logger.LogInformation("Cancelling infinite worker");
                 cts.Cancel();
 
-                await run.ConfigureAwait(false);
+                await run;
 
                 // Assert
                 pi.Should().BeNull();
@@ -151,7 +151,7 @@ namespace DeadManSwitch.Tests
                 var worker = InfiniteWorker(workItems);
 
                 // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 pi.Should().Be(Math.PI);
@@ -181,7 +181,7 @@ namespace DeadManSwitch.Tests
                 var worker = InfiniteWorker(workItems);
 
                 // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 pi.Should().NotBeNull();
@@ -218,7 +218,7 @@ namespace DeadManSwitch.Tests
                 var worker = InfiniteWorker(workItems);
 
                 // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 e.Should().Be(Math.E);
@@ -255,7 +255,7 @@ namespace DeadManSwitch.Tests
                 var worker = InfiniteWorker(workItems);
 
                 // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 e.Should().BeNull();
@@ -288,7 +288,7 @@ namespace DeadManSwitch.Tests
                     ));
 
                 // Act
-                await _runner.RunAsync(worker, options, cts.Token).ConfigureAwait(false);
+                await _runner.RunAsync(worker, options, cts.Token);
 
                 // Assert
                 pies.Should().HaveCount(3);

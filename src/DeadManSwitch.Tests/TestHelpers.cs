@@ -25,7 +25,7 @@ namespace DeadManSwitch.Tests
                 {
                     var iteration = iterations[iterationIndex];
                     iterationIndex++;
-                    await iteration(deadManSwitch, cancellationToken).ConfigureAwait(false);
+                    await iteration(deadManSwitch, cancellationToken);
                 }
                 else
                 {
@@ -38,9 +38,9 @@ namespace DeadManSwitch.Tests
         {
             return new LambdaDeadManSwitchWorker<TResult>(async (deadManSwitch, cancellationToken) =>
             {
-                await work(deadManSwitch, cancellationToken).ConfigureAwait(false);
+                await work(deadManSwitch, cancellationToken);
 
-                return await result.ConfigureAwait(false);
+                return await result;
             });
         }
 
@@ -55,7 +55,7 @@ namespace DeadManSwitch.Tests
                     if (cancellationToken.IsCancellationRequested)
                         throw new OperationCanceledException(cancellationToken);
 
-                    await task(deadManSwitch, cancellationToken).ConfigureAwait(false);
+                    await task(deadManSwitch, cancellationToken);
                 }
             };
         }
@@ -72,7 +72,7 @@ namespace DeadManSwitch.Tests
 
         public static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
         {
-            return async (deadManSwitch, cancellationToken) => { await Task.Delay(duration, cancellationToken).ConfigureAwait(false); };
+            return async (deadManSwitch, cancellationToken) => { await Task.Delay(duration, cancellationToken); };
         }
 
         public static Func<IDeadManSwitch, CancellationToken, Task> Do(Action<IDeadManSwitch> action)
