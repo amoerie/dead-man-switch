@@ -16,7 +16,8 @@ namespace DeadManSwitch.Tests.Logging
         /// </summary>
         public TestLoggerFactory(ILoggerFactory loggerFactory)
         {
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _loggerFactory =
+                loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
         /// <inheritdoc />

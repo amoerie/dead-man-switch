@@ -14,12 +14,16 @@ namespace DeadManSwitch.AspNetCore.Tests
 {
     public class TestsForDependencyInjection
     {
-        private static IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> WorkItems(params Func<IDeadManSwitch, CancellationToken, Task>[] workItems)
+        private static IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> WorkItems(
+            params Func<IDeadManSwitch, CancellationToken, Task>[] workItems
+        )
         {
             return workItems;
         }
 
-        private static Func<IDeadManSwitch, CancellationToken, Task> Work(params Func<IDeadManSwitch, CancellationToken, Task>[] workItems)
+        private static Func<IDeadManSwitch, CancellationToken, Task> Work(
+            params Func<IDeadManSwitch, CancellationToken, Task>[] workItems
+        )
         {
             return async (deadManSwitch, cancellationToken) =>
             {
@@ -35,48 +39,63 @@ namespace DeadManSwitch.AspNetCore.Tests
             };
         }
 
-        private static IInfiniteDeadManSwitchWorker InfiniteWorker(IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> workItems)
+        private static IInfiniteDeadManSwitchWorker InfiniteWorker(
+            IEnumerable<Func<IDeadManSwitch, CancellationToken, Task>> workItems
+        )
         {
             var iterationIndex = 0;
             var iterations = workItems.ToList();
-            return new LambdaInfiniteDeadManSwitchWorker(async (deadManSwitch, cancellationToken) =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
+            return new LambdaInfiniteDeadManSwitchWorker(
+                async (deadManSwitch, cancellationToken) =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
 
-                if (iterationIndex < iterations.Count)
-                {
-                    var iteration = iterations[iterationIndex];
-                    iterationIndex++;
-                    await iteration(deadManSwitch, cancellationToken);
+                    if (iterationIndex < iterations.Count)
+                    {
+                        var iteration = iterations[iterationIndex];
+                        iterationIndex++;
+                        await iteration(deadManSwitch, cancellationToken);
+                    }
+                    else
+                    {
+                        throw new Exception("No more actions");
+                    }
                 }
-                else
-                {
-                    throw new Exception("No more actions");
-                }
-            });
+            );
         }
 
-        private static IDeadManSwitchWorker<TResult> Worker<TResult>(Func<IDeadManSwitch, CancellationToken, Task> work, Task<TResult> result)
+        private static IDeadManSwitchWorker<TResult> Worker<TResult>(
+            Func<IDeadManSwitch, CancellationToken, Task> work,
+            Task<TResult> result
+        )
         {
-            return new LambdaDeadManSwitchWorker<TResult>(async (deadManSwitch, cancellationToken) =>
-            {
-                await work(deadManSwitch, cancellationToken);
+            return new LambdaDeadManSwitchWorker<TResult>(
+                async (deadManSwitch, cancellationToken) =>
+                {
+                    await work(deadManSwitch, cancellationToken);
 
-                return await result;
-            });
+                    return await result;
+                }
+            );
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification), cancellationToken);
+            return (deadManSwitch, cancellationToken) =>
+                Task.Run(() => deadManSwitch.Notify(notification), cancellationToken);
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
         {
-            return async (deadManSwitch, cancellationToken) => { await Task.Delay(duration, cancellationToken); };
+            return async (deadManSwitch, cancellationToken) =>
+            {
+                await Task.Delay(duration, cancellationToken);
+            };
         }
 
-        private static Func<IDeadManSwitch, CancellationToken, Task> Do(Action<IDeadManSwitch> action)
+        private static Func<IDeadManSwitch, CancellationToken, Task> Do(
+            Action<IDeadManSwitch> action
+        )
         {
             return (deadManSwitch, cancellationToken) =>
             {
@@ -87,12 +106,14 @@ namespace DeadManSwitch.AspNetCore.Tests
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Pause()
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Suspend(), cancellationToken);
+            return (deadManSwitch, cancellationToken) =>
+                Task.Run(() => deadManSwitch.Suspend(), cancellationToken);
         }
 
         private static Func<IDeadManSwitch, CancellationToken, Task> Resume()
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Resume(), cancellationToken);
+            return (deadManSwitch, cancellationToken) =>
+                Task.Run(() => deadManSwitch.Resume(), cancellationToken);
         }
 
         private static Task<TResult> Result<TResult>(TResult value)
@@ -149,13 +170,8 @@ namespace DeadManSwitch.AspNetCore.Tests
                 double? pi = null;
                 var worker = InfiniteWorker(
                     WorkItems(
-                        Work(
-                            Do(_ => pi = Math.PI),
-                            Notify("Test")
-                        ),
-                        Work(
-                            Do(_ => cts.Cancel())
-                        )
+                        Work(Do(_ => pi = Math.PI), Notify("Test")),
+                        Work(Do(_ => cts.Cancel()))
                     )
                 );
                 await runner.RunAsync(worker, new DeadManSwitchOptions(), cts.Token);
@@ -178,14 +194,12 @@ namespace DeadManSwitch.AspNetCore.Tests
             // Act
             var runner = serviceProvider.GetRequiredService<IDeadManSwitchRunner>();
 
-            var worker = Worker(
-                Work(
-                    Notify("Test")
-                ),
-                Result(Math.PI)
+            var worker = Worker(Work(Notify("Test")), Result(Math.PI));
+            var result = await runner.RunAsync(
+                worker,
+                new DeadManSwitchOptions(),
+                TestContext.Current.CancellationToken
             );
-            var result = await runner.RunAsync(worker, new DeadManSwitchOptions(), CancellationToken.None)
-                ;
 
             // Arrange
             runner.Should().NotBeNull();

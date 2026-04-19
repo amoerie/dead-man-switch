@@ -10,8 +10,8 @@ namespace DeadManSwitch
     /// </summary>
     public static class DeadManSwitchTask
     {
-        private static readonly Lazy<IDeadManSwitchRunner> DeadManSwitchRunner
-            = new Lazy<IDeadManSwitchRunner>(global::DeadManSwitch.DeadManSwitchRunner.Create);
+        private static readonly Lazy<IDeadManSwitchRunner> DeadManSwitchRunner =
+            new Lazy<IDeadManSwitchRunner>(global::DeadManSwitch.DeadManSwitchRunner.Create);
 
         /// <summary>
         ///     Starts the specified <paramref name="worker" />, to which it will pass the <see cref="IDeadManSwitch" /> and a cancellation token.
@@ -28,9 +28,14 @@ namespace DeadManSwitch
         public static Task<TResult> RunAsync<TResult>(
             Func<IDeadManSwitch, CancellationToken, Task<TResult>> worker,
             DeadManSwitchOptions options,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
-            return DeadManSwitchRunner.Value.RunAsync(new LambdaDeadManSwitchWorker<TResult>(worker), options, cancellationToken);
+            return DeadManSwitchRunner.Value.RunAsync(
+                new LambdaDeadManSwitchWorker<TResult>(worker),
+                options,
+                cancellationToken
+            );
         }
     }
 }

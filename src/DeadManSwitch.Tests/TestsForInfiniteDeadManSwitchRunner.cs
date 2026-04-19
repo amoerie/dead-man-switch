@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,27 +8,39 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Xunit;
-using Xunit.Abstractions;
 using static DeadManSwitch.Tests.TestHelpers;
 
 namespace DeadManSwitch.Tests
 {
     public sealed class TestsForInfiniteDeadManSwitchRunner : IDisposable
     {
-        public TestsForInfiniteDeadManSwitchRunner(ITestOutputHelper testOutputHelper)
+        public TestsForInfiniteDeadManSwitchRunner()
         {
+            var testOutput = TestContext.Current.TestOutputHelper;
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
-                .WriteTo.TestOutput(testOutputHelper,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
+                .WriteTo.Sink(
+                    new XUnitTestOutputSink(
+                        testOutput,
+                        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}"
+                    )
+                )
                 .CreateLogger();
-            _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
+            _loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddSerilog(logger);
+            });
             var loggerFactory = new TestLoggerFactory(_loggerFactory);
             _logger = _loggerFactory.CreateLogger<TestsForInfiniteDeadManSwitchRunner>();
-            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(loggerFactory));
-            _runner = new InfiniteDeadManSwitchRunner(loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(), _sessionFactory);
+            _sessionFactory = new CapturingDeadManSwitchSessionFactory(
+                new DeadManSwitchSessionFactory(loggerFactory)
+            );
+            _runner = new InfiniteDeadManSwitchRunner(
+                loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(),
+                _sessionFactory
+            );
         }
 
         public void Dispose()
@@ -47,8 +59,9 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                double? pi = null, e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                double? pi = null,
+                    e = null;
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var workItems = WorkItems(
                     Work(
                         Pause(),
@@ -81,12 +94,9 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? pi = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(3)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(3) };
                 var workItems = WorkItems(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(4)),
-                        Do(_ => pi = Math.PI)
-                    ),
+                    Work(Sleep(TimeSpan.FromSeconds(4)), Do(_ => pi = Math.PI)),
                     Work(
                         Do(_ => _logger.LogInformation("Cancelling infinite worker")),
                         Do(_ => cts.Cancel())
@@ -96,7 +106,10 @@ namespace DeadManSwitch.Tests
 
                 // Act
                 var run = _runner.RunAsync(worker, options, cts.Token);
-                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                await Task.Delay(
+                    TimeSpan.FromMilliseconds(10),
+                    TestContext.Current.CancellationToken
+                );
                 cts.Cancel();
                 await run;
 
@@ -112,18 +125,18 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? pi = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(5) };
                 var workItems = WorkItems(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(2)),
-                        Do(_ => pi = Math.PI)
-                    )
+                    Work(Sleep(TimeSpan.FromSeconds(2)), Do(_ => pi = Math.PI))
                 );
                 var worker = InfiniteWorker(workItems);
 
                 // Act
                 var run = _runner.RunAsync(worker, options, cts.Token);
-                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                await Task.Delay(
+                    TimeSpan.FromMilliseconds(10),
+                    TestContext.Current.CancellationToken
+                );
 
                 _logger.LogInformation("Cancelling infinite worker");
                 cts.Cancel();
@@ -142,7 +155,7 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? pi = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var workItems = WorkItems(
                     Work(Do(_ => pi = Math.PI)),
                     Do(_ => _logger.LogInformation("Cancelling infinite worker")),
@@ -165,14 +178,9 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? pi = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var workItems = WorkItems(
-                    Work(
-                        Pause(),
-                        Sleep(TimeSpan.FromSeconds(3)),
-                        Do(_ => pi = Math.PI),
-                        Resume()
-                    ),
+                    Work(Pause(), Sleep(TimeSpan.FromSeconds(3)), Do(_ => pi = Math.PI), Resume()),
                     Work(
                         Do(_ => _logger.LogInformation("Cancelling infinite worker")),
                         Do(_ => cts.Cancel())
@@ -196,7 +204,7 @@ namespace DeadManSwitch.Tests
                 // Arrange
                 double? pi = null;
                 double? e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var workItems = WorkItems(
                     Work(
                         Notify("Going to sleep for 1 second"),
@@ -207,9 +215,7 @@ namespace DeadManSwitch.Tests
                         Sleep(TimeSpan.FromSeconds(1)),
                         Do(_ => e = Math.E)
                     ),
-                    Work(
-                        Do(_ => pi = Math.PI)
-                    ),
+                    Work(Do(_ => pi = Math.PI)),
                     Work(
                         Do(_ => _logger.LogInformation("Cancelling infinite worker")),
                         Do(_ => cts.Cancel())
@@ -234,7 +240,7 @@ namespace DeadManSwitch.Tests
                 // Arrange
                 double? pi = null;
                 double? e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var workItems = WorkItems(
                     Work(
                         Notify("Going to sleep for 5 seconds"),
@@ -270,22 +276,18 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 var pies = new List<double>();
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = InfiniteWorker(
                     WorkItems(
-                        Work(
-                            Do(_ => pies.Add(Math.PI))
-                        ),
-                        Work(
-                            Do(_ => pies.Add(Math.PI))),
-                        Work(
-                            Do(_ => pies.Add(Math.PI))
-                        ),
+                        Work(Do(_ => pies.Add(Math.PI))),
+                        Work(Do(_ => pies.Add(Math.PI))),
+                        Work(Do(_ => pies.Add(Math.PI))),
                         Work(
                             Do(_ => _logger.LogInformation("Cancelling infinite worker")),
                             Do(_ => cts.Cancel())
                         )
-                    ));
+                    )
+                );
 
                 // Act
                 await _runner.RunAsync(worker, options, cts.Token);

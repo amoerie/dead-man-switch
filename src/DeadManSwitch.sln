@@ -23,8 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.AspNetCore", "DeadManSwitch.AspNetCore\DeadManSwitch.AspNetCore.csproj", "{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Examples.AspNetFramework", "DeadManSwitch.Examples.AspNetFramework\DeadManSwitch.Examples.AspNetFramework.csproj", "{56DB1403-B120-4740-8550-A51A450B9AAA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.Benchmarks", "DeadManSwitch.Benchmarks\DeadManSwitch.Benchmarks.csproj", "{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeadManSwitch.AspNetCore.Tests", "DeadManSwitch.AspNetCore.Tests\DeadManSwitch.AspNetCore.Tests.csproj", "{63B51115-639A-4E4A-978B-74044467B958}"
@@ -51,10 +49,6 @@ Global
 		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2DB0E70-9775-4FBB-AD6D-119F5E5D9AB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56DB1403-B120-4740-8550-A51A450B9AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56DB1403-B120-4740-8550-A51A450B9AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56DB1403-B120-4740-8550-A51A450B9AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56DB1403-B120-4740-8550-A51A450B9AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43B14B3B-78C1-4703-9D1E-6ACEFA5BAC67}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -32,13 +32,21 @@ namespace DeadManSwitch.Logging
         /// <summary>
         ///     Logs an error message
         /// </summary>
-        [SuppressMessage("ReSharper", "CA1716", Justification = "This is a common name for a log method")]
+        [SuppressMessage(
+            "ReSharper",
+            "CA1716",
+            Justification = "This is a common name for a log method"
+        )]
         void Error(string message, params object[] args);
 
         /// <summary>
         ///     Logs an error message with an exception
         /// </summary>
-        [SuppressMessage("ReSharper", "CA1716", Justification = "This is a common name for a log method")]
+        [SuppressMessage(
+            "ReSharper",
+            "CA1716",
+            Justification = "This is a common name for a log method"
+        )]
         void Error(Exception exception, string message, params object[] args);
     }
 }

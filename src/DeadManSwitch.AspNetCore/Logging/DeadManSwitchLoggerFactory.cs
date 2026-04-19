@@ -16,7 +16,8 @@ namespace DeadManSwitch.AspNetCore.Logging
         /// </summary>
         public DeadManSwitchLoggerFactory(ILoggerFactory loggerFactory)
         {
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _loggerFactory =
+                loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         }
 
         /// <inheritdoc />

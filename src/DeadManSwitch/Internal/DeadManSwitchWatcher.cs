@@ -17,14 +17,22 @@ namespace DeadManSwitch.Internal
         private readonly IDeadManSwitchLogger<DeadManSwitchWatcher> _logger;
         private readonly DeadManSwitchOptions _options;
 
-        public DeadManSwitchWatcher(IDeadManSwitchContext deadManSwitchContext,
+        public DeadManSwitchWatcher(
+            IDeadManSwitchContext deadManSwitchContext,
             DeadManSwitchOptions deadManSwitchOptions,
             IDeadManSwitchTriggerer deadManSwitchTriggerer,
-            IDeadManSwitchLogger<DeadManSwitchWatcher> logger)
+            IDeadManSwitchLogger<DeadManSwitchWatcher> logger
+        )
         {
-            _context = deadManSwitchContext ?? throw new ArgumentNullException(nameof(deadManSwitchContext));
-            _options = deadManSwitchOptions ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
-            _deadManSwitchTriggerer = deadManSwitchTriggerer ?? throw new ArgumentNullException(nameof(deadManSwitchTriggerer));
+            _context =
+                deadManSwitchContext
+                ?? throw new ArgumentNullException(nameof(deadManSwitchContext));
+            _options =
+                deadManSwitchOptions
+                ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
+            _deadManSwitchTriggerer =
+                deadManSwitchTriggerer
+                ?? throw new ArgumentNullException(nameof(deadManSwitchTriggerer));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -44,7 +52,9 @@ namespace DeadManSwitch.Internal
 
                 if (!_context.IsSuspended)
                 {
-                    timeSinceLastNotification = TimeSpan.FromTicks(DateTime.UtcNow.Ticks - _context.LastNotifiedTicks);
+                    timeSinceLastNotification = TimeSpan.FromTicks(
+                        DateTime.UtcNow.Ticks - _context.LastNotifiedTicks
+                    );
                     ;
 
                     if (timeSinceLastNotification > _options.Timeout)
@@ -55,15 +65,16 @@ namespace DeadManSwitch.Internal
                 }
                 else
                 {
-                    _logger.Debug("The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed");
+                    _logger.Debug(
+                        "The dead man's switch is suspended. The worker will not be cancelled until the dead man's switch is resumed"
+                    );
 
                     timeSinceLastNotification = TimeSpan.Zero;
                 }
 
                 var timeRemaining = _options.Timeout - timeSinceLastNotification;
 
-                await Task.Delay(timeRemaining, cancellationToken)
-                    .ConfigureAwait(false);
+                await Task.Delay(timeRemaining, cancellationToken).ConfigureAwait(false);
             }
 
             _logger.Debug("Dead man switch watcher was canceled");
