@@ -112,8 +112,7 @@ public static class ExampleInfiniteProgram
 
 For more examples, including ones that use dependency injection and allow you to hook into the logging infrastructure, see the following links:
 
-- [Examples for .NET Core](https://github.com/amoerie/dead-man-switch/tree/main/src/DeadManSwitch.Examples.AspNetCore)
-- [Examples for .NET Framework](https://github.com/amoerie/dead-man-switch/tree/main/src/DeadManSwitch.Examples.AspNetFramework)
+- [Examples for ASP.NET Core](https://github.com/amoerie/dead-man-switch/tree/main/src/DeadManSwitch.Examples.AspNetCore)
 
 # NuGet
 
