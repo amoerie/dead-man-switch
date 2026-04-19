@@ -13,27 +13,28 @@ public static class ExampleProgram
     public static async Task Main()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
-            
-        var options = new DeadManSwitchOptions
-        {
-            Timeout = TimeSpan.FromSeconds(60)
-        };
-        var result = await DeadManSwitchTask.RunAsync(async (deadManSwitch, cancellationToken) =>
-        {
-            deadManSwitch.Notify("Beginning work");
 
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+        var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(60) };
+        var result = await DeadManSwitchTask.RunAsync(
+            async (deadManSwitch, cancellationToken) =>
+            {
+                deadManSwitch.Notify("Beginning work");
 
-            deadManSwitch.Notify("Still busy, please don't cancel");
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
-            // tell the dead man's switch to stop the clock
-            deadManSwitch.Suspend();
+                deadManSwitch.Notify("Still busy, please don't cancel");
 
-            // tell the dead man's switch to resume the clock
-            deadManSwitch.Resume();
+                // tell the dead man's switch to stop the clock
+                deadManSwitch.Suspend();
 
-            return Math.PI;
-        }, options, cancellationTokenSource.Token);
+                // tell the dead man's switch to resume the clock
+                deadManSwitch.Resume();
+
+                return Math.PI;
+            },
+            options,
+            cancellationTokenSource.Token
+        );
 
         Debug.Assert(result.Equals(Math.PI));
     }

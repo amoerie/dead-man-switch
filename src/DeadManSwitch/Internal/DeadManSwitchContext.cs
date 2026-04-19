@@ -31,8 +31,12 @@ namespace DeadManSwitch.Internal
 
         public DeadManSwitchContext(DeadManSwitchOptions deadManSwitchOptions)
         {
-            _deadManSwitchOptions = deadManSwitchOptions ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
-            _notifications = new DeadManSwitchNotification[_deadManSwitchOptions.NumberOfNotificationsToKeep];
+            _deadManSwitchOptions =
+                deadManSwitchOptions
+                ?? throw new ArgumentNullException(nameof(deadManSwitchOptions));
+            _notifications = new DeadManSwitchNotification[
+                _deadManSwitchOptions.NumberOfNotificationsToKeep
+            ];
             _lastNotifiedTicks = DateTime.UtcNow.Ticks;
             _notificationsNextItemIndex = 0;
             _notificationsSyncRoot = new object();
@@ -61,13 +65,17 @@ namespace DeadManSwitch.Internal
             lock (_notificationsSyncRoot)
             {
                 _notifications[_notificationsNextItemIndex] = deadManSwitchNotification;
-                _notificationsNextItemIndex = (_notificationsNextItemIndex + 1) % _notifications.Length;
+                _notificationsNextItemIndex =
+                    (_notificationsNextItemIndex + 1) % _notifications.Length;
             }
         }
 
         public void Cancel()
         {
-            var cancellationTokenSource = Interlocked.Exchange(ref _cancellationTokenSource, new CancellationTokenSource());
+            var cancellationTokenSource = Interlocked.Exchange(
+                ref _cancellationTokenSource,
+                new CancellationTokenSource()
+            );
 
             cancellationTokenSource.Cancel();
             cancellationTokenSource.Dispose();
@@ -78,13 +86,21 @@ namespace DeadManSwitch.Internal
             get
             {
                 var numberOfNotificationsToKeep = _deadManSwitchOptions.NumberOfNotificationsToKeep;
-                var notifications = new List<DeadManSwitchNotification>(numberOfNotificationsToKeep);
+                var notifications = new List<DeadManSwitchNotification>(
+                    numberOfNotificationsToKeep
+                );
 
                 lock (_notificationsSyncRoot)
                 {
-                    for (var i = _notificationsNextItemIndex; i < numberOfNotificationsToKeep + _notificationsNextItemIndex; i++)
+                    for (
+                        var i = _notificationsNextItemIndex;
+                        i < numberOfNotificationsToKeep + _notificationsNextItemIndex;
+                        i++
+                    )
                     {
-                        var notification = _notifications[(i + _notificationsNextItemIndex) % numberOfNotificationsToKeep];
+                        var notification = _notifications[
+                            (i + _notificationsNextItemIndex) % numberOfNotificationsToKeep
+                        ];
                         if (notification == null)
                             continue;
 

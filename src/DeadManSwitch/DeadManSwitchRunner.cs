@@ -23,7 +23,11 @@ namespace DeadManSwitch
         ///     When the worked was canceled by the dead man's switch, or when the provided <paramref name="cancellationToken" /> is cancelled while
         ///     the worker is still busy
         /// </exception>
-        Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> worker, DeadManSwitchOptions options, CancellationToken cancellationToken);
+        Task<TResult> RunAsync<TResult>(
+            IDeadManSwitchWorker<TResult> worker,
+            DeadManSwitchOptions options,
+            CancellationToken cancellationToken
+        );
     }
 
     /// <inheritdoc />
@@ -37,33 +41,54 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="logger">The logger that will be used for diagnostic log messages</param>
         /// <param name="deadManSwitchSessionFactory">The session factory that is capable of starting a new dead man's switch session</param>
-        internal DeadManSwitchRunner(IDeadManSwitchLogger<DeadManSwitchRunner> logger,
-            IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
+        internal DeadManSwitchRunner(
+            IDeadManSwitchLogger<DeadManSwitchRunner> logger,
+            IDeadManSwitchSessionFactory deadManSwitchSessionFactory
+        )
         {
-            _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
+            _deadManSwitchSessionFactory =
+                deadManSwitchSessionFactory
+                ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<TResult> RunAsync<TResult>(IDeadManSwitchWorker<TResult> worker, DeadManSwitchOptions options,
-            CancellationToken cancellationToken)
+        public async Task<TResult> RunAsync<TResult>(
+            IDeadManSwitchWorker<TResult> worker,
+            DeadManSwitchOptions options,
+            CancellationToken cancellationToken
+        )
         {
-            if (worker == null) throw new ArgumentNullException(nameof(worker));
+            if (worker == null)
+                throw new ArgumentNullException(nameof(worker));
 
             using var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options);
-            using var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            using var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchSession.DeadManSwitchContext.CancellationToken);
-            
+            using var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken
+            );
+            using var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken,
+                deadManSwitchSession.DeadManSwitchContext.CancellationToken
+            );
+
             var watcherToken = watcherCTS.Token;
             var workerToken = workerCTS.Token;
-            
+
             _logger.Trace("Running worker {WorkerName} using a dead man's switch", worker.Name);
 
             var deadManSwitch = deadManSwitchSession.DeadManSwitch;
             var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
 
-            var workerTask = Task.Run(async () => await worker.WorkAsync(deadManSwitch, workerToken).ConfigureAwait(false), CancellationToken.None);
-            var watcherTask = Task.Run(async () => await deadManSwitchWatcher.WatchAsync(watcherToken).ConfigureAwait(false), CancellationToken.None);
+            var workerTask = Task.Run(
+                async () =>
+                    await worker.WorkAsync(deadManSwitch, workerToken).ConfigureAwait(false),
+                CancellationToken.None
+            );
+            var watcherTask = Task.Run(
+                async () =>
+                    await deadManSwitchWatcher.WatchAsync(watcherToken).ConfigureAwait(false),
+                CancellationToken.None
+            );
 
             var task = await Task.WhenAny(workerTask, watcherTask).ConfigureAwait(false);
             if (task == workerTask)
@@ -92,10 +117,12 @@ namespace DeadManSwitch
         /// <returns>A new <see cref="IDeadManSwitchRunner" /> that is capable of running <see cref="IDeadManSwitchWorker{TResult}" /></returns>
         public static IDeadManSwitchRunner Create(IDeadManSwitchLoggerFactory loggerFactory)
         {
-            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
+            if (loggerFactory == null)
+                throw new ArgumentNullException(nameof(loggerFactory));
             return new DeadManSwitchRunner(
                 loggerFactory.CreateLogger<DeadManSwitchRunner>(),
-                new DeadManSwitchSessionFactory(loggerFactory));
+                new DeadManSwitchSessionFactory(loggerFactory)
+            );
         }
     }
 }

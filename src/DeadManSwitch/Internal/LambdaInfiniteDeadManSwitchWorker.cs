@@ -8,7 +8,9 @@ namespace DeadManSwitch.Internal
     {
         private readonly Func<IDeadManSwitch, CancellationToken, Task> _lambda;
 
-        public LambdaInfiniteDeadManSwitchWorker(Func<IDeadManSwitch, CancellationToken, Task> lambda)
+        public LambdaInfiniteDeadManSwitchWorker(
+            Func<IDeadManSwitch, CancellationToken, Task> lambda
+        )
         {
             _lambda = lambda ?? throw new ArgumentNullException(nameof(lambda));
         }

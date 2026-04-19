@@ -24,11 +24,8 @@ public static class ExampleProgramUsingDependencyInjection
         var worker = new ExampleWorker();
 
         using var cancellationTokenSource = new CancellationTokenSource();
-            
-        var options = new DeadManSwitchOptions
-        {
-            Timeout = TimeSpan.FromSeconds(60)
-        };
+
+        var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(60) };
         var run = runner.RunAsync(worker, options, cancellationTokenSource.Token);
 
         // if you want to cancel at some point: cancellationTokenSource.Cancel();
@@ -38,13 +35,16 @@ public static class ExampleProgramUsingDependencyInjection
         Debug.Assert(result.Equals(Math.PI));
     }
 }
-    
+
 public class ExampleWorker : IDeadManSwitchWorker<double>
 {
     // for diagnostic purposes
     public string Name => "Example one time worker";
 
-    public async Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
+    public async Task<double> WorkAsync(
+        IDeadManSwitch deadManSwitch,
+        CancellationToken cancellationToken
+    )
     {
         if (deadManSwitch == null)
             throw new ArgumentNullException(nameof(deadManSwitch));
@@ -60,7 +60,10 @@ public class ExampleWorker : IDeadManSwitchWorker<double>
         // tell the dead man's switch to stop the clock
         deadManSwitch.Suspend();
 
-        await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
+        await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
         // tell the dead man's switch to resume the clock
         deadManSwitch.Resume();
@@ -73,7 +76,9 @@ public class ExampleWorker : IDeadManSwitchWorker<double>
         await Task.Delay(100, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(CancellationToken cancellationToken)
+    private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(
+        CancellationToken cancellationToken
+    )
     {
         await Task.Delay(100000, cancellationToken).ConfigureAwait(false);
     }

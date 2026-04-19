@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
@@ -14,5 +13,4 @@
     <ProjectReference Include="..\DeadManSwitch.AspNetCore\DeadManSwitch.AspNetCore.csproj" />
     <ProjectReference Include="..\DeadManSwitch\DeadManSwitch.csproj" />
   </ItemGroup>
-
 </Project>

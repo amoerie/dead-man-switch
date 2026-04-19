@@ -8,12 +8,16 @@ namespace DeadManSwitch.Tests
 {
     public static class TestHelpers
     {
-        public static IInfiniteDeadManSwitchWorker InfiniteWorker(Func<IDeadManSwitch, CancellationToken, Task> worker)
+        public static IInfiniteDeadManSwitchWorker InfiniteWorker(
+            Func<IDeadManSwitch, CancellationToken, Task> worker
+        )
         {
             return new LambdaInfiniteDeadManSwitchWorker(worker);
         }
 
-        public static Func<IDeadManSwitch, CancellationToken, Task> WorkItems(params Func<IDeadManSwitch, CancellationToken, Task>[] workItems)
+        public static Func<IDeadManSwitch, CancellationToken, Task> WorkItems(
+            params Func<IDeadManSwitch, CancellationToken, Task>[] workItems
+        )
         {
             var iterationIndex = 0;
             var iterations = workItems.ToList();
@@ -34,17 +38,24 @@ namespace DeadManSwitch.Tests
             };
         }
 
-        public static IDeadManSwitchWorker<TResult> Worker<TResult>(Func<IDeadManSwitch, CancellationToken, Task> work, Task<TResult> result)
+        public static IDeadManSwitchWorker<TResult> Worker<TResult>(
+            Func<IDeadManSwitch, CancellationToken, Task> work,
+            Task<TResult> result
+        )
         {
-            return new LambdaDeadManSwitchWorker<TResult>(async (deadManSwitch, cancellationToken) =>
-            {
-                await work(deadManSwitch, cancellationToken);
+            return new LambdaDeadManSwitchWorker<TResult>(
+                async (deadManSwitch, cancellationToken) =>
+                {
+                    await work(deadManSwitch, cancellationToken);
 
-                return await result;
-            });
+                    return await result;
+                }
+            );
         }
 
-        public static Func<IDeadManSwitch, CancellationToken, Task> Work(params Func<IDeadManSwitch, CancellationToken, Task>[] tasks)
+        public static Func<IDeadManSwitch, CancellationToken, Task> Work(
+            params Func<IDeadManSwitch, CancellationToken, Task>[] tasks
+        )
         {
             return async (deadManSwitch, cancellationToken) =>
             {
@@ -67,15 +78,21 @@ namespace DeadManSwitch.Tests
 
         public static Func<IDeadManSwitch, CancellationToken, Task> Notify(string notification)
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(() => deadManSwitch.Notify(notification), cancellationToken);
+            return (deadManSwitch, cancellationToken) =>
+                Task.Run(() => deadManSwitch.Notify(notification), cancellationToken);
         }
 
         public static Func<IDeadManSwitch, CancellationToken, Task> Sleep(TimeSpan duration)
         {
-            return async (deadManSwitch, cancellationToken) => { await Task.Delay(duration, cancellationToken); };
+            return async (deadManSwitch, cancellationToken) =>
+            {
+                await Task.Delay(duration, cancellationToken);
+            };
         }
 
-        public static Func<IDeadManSwitch, CancellationToken, Task> Do(Action<IDeadManSwitch> action)
+        public static Func<IDeadManSwitch, CancellationToken, Task> Do(
+            Action<IDeadManSwitch> action
+        )
         {
             return (deadManSwitch, cancellationToken) =>
             {
@@ -86,12 +103,14 @@ namespace DeadManSwitch.Tests
 
         public static Func<IDeadManSwitch, CancellationToken, Task> Pause()
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(deadManSwitch.Suspend, cancellationToken);
+            return (deadManSwitch, cancellationToken) =>
+                Task.Run(deadManSwitch.Suspend, cancellationToken);
         }
 
         public static Func<IDeadManSwitch, CancellationToken, Task> Resume()
         {
-            return (deadManSwitch, cancellationToken) => Task.Run(deadManSwitch.Resume, cancellationToken);
+            return (deadManSwitch, cancellationToken) =>
+                Task.Run(deadManSwitch.Resume, cancellationToken);
         }
     }
 }
