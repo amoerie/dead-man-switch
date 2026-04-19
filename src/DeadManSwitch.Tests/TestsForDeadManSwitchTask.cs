@@ -19,7 +19,7 @@ namespace DeadManSwitch.Tests
             };
 
             // Act
-            var result = await DeadManSwitchTask.RunAsync(worker, DeadManSwitchOptions.Default, CancellationToken.None);
+            var result = await DeadManSwitchTask.RunAsync(worker, DeadManSwitchOptions.Default, TestContext.Current.CancellationToken);
 
             // Arrange
             result.Should().Be(Math.PI);
