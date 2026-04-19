@@ -8,21 +8,25 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Xunit;
-using Xunit.Abstractions;
 using static DeadManSwitch.Tests.TestHelpers;
 
 namespace DeadManSwitch.Tests
 {
     public sealed class TestsForDeadManSwitchRunner : IDisposable
     {
-        public TestsForDeadManSwitchRunner(ITestOutputHelper testOutputHelper)
+        public TestsForDeadManSwitchRunner()
         {
+            var testOutput = TestContext.Current.TestOutputHelper;
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
-                .WriteTo.TestOutput(testOutputHelper,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
+                .WriteTo.Sink(
+                    new XUnitTestOutputSink(
+                        testOutput,
+                        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}"
+                    )
+                )
                 .CreateLogger();
             _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
             var loggerFactory = new TestLoggerFactory(_loggerFactory);
@@ -258,7 +262,7 @@ namespace DeadManSwitch.Tests
                 // Act
                 var runTask = _runner.RunAsync(worker, options, cts.Token);
 
-                await Task.Delay(TimeSpan.FromSeconds(0.5));
+                await Task.Delay(TimeSpan.FromSeconds(0.5), TestContext.Current.CancellationToken);
 
                 cts.Cancel();
 

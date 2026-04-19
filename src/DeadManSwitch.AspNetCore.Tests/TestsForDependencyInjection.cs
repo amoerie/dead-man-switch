@@ -184,7 +184,7 @@ namespace DeadManSwitch.AspNetCore.Tests
                 ),
                 Result(Math.PI)
             );
-            var result = await runner.RunAsync(worker, new DeadManSwitchOptions(), CancellationToken.None)
+            var result = await runner.RunAsync(worker, new DeadManSwitchOptions(), TestContext.Current.CancellationToken)
                 ;
 
             // Arrange
