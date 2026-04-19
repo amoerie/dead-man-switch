@@ -38,4 +38,4 @@ jobs:
       - name: Test (net10.0)
         run: dotnet test ./src/DeadManSwitch.sln --no-restore --no-build --configuration Release --framework net10.0
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v6
