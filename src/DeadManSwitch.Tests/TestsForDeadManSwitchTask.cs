@@ -12,14 +12,21 @@ namespace DeadManSwitch.Tests
         public async Task ShouldBeAbleToRunCreatedRunner()
         {
             // Arrange
-            Func<IDeadManSwitch, CancellationToken, Task<double>> worker = (deadManSwitch, cancellationToken) =>
+            Func<IDeadManSwitch, CancellationToken, Task<double>> worker = (
+                deadManSwitch,
+                cancellationToken
+            ) =>
             {
                 deadManSwitch.Notify("Test");
                 return Task.FromResult(Math.PI);
             };
 
             // Act
-            var result = await DeadManSwitchTask.RunAsync(worker, DeadManSwitchOptions.Default, TestContext.Current.CancellationToken);
+            var result = await DeadManSwitchTask.RunAsync(
+                worker,
+                DeadManSwitchOptions.Default,
+                TestContext.Current.CancellationToken
+            );
 
             // Arrange
             result.Should().Be(Math.PI);

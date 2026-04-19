@@ -20,7 +20,7 @@ namespace DeadManSwitch.Benchmarks
             _deadManSwitchOptions = new DeadManSwitchOptions
             {
                 Timeout = TimeSpan.FromSeconds(1),
-                NumberOfNotificationsToKeep = 5
+                NumberOfNotificationsToKeep = 5,
             };
         }
 
@@ -29,7 +29,9 @@ namespace DeadManSwitch.Benchmarks
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var benchmarkWorker = new BenchmarkWorker();
-            return await _deadManSwitchRunner.RunAsync(benchmarkWorker, _deadManSwitchOptions, cts.Token).ConfigureAwait(false);
+            return await _deadManSwitchRunner
+                .RunAsync(benchmarkWorker, _deadManSwitchOptions, cts.Token)
+                .ConfigureAwait(false);
         }
 
         [Benchmark]
@@ -37,7 +39,9 @@ namespace DeadManSwitch.Benchmarks
         {
             using var cts = new CancellationTokenSource();
             var infiniteBenchmarkWorker = new InfiniteBenchmarkWorker(10, () => cts.Cancel());
-            await _infiniteDeadManSwitchRunner.RunAsync(infiniteBenchmarkWorker, _deadManSwitchOptions, cts.Token).ConfigureAwait(false);
+            await _infiniteDeadManSwitchRunner
+                .RunAsync(infiniteBenchmarkWorker, _deadManSwitchOptions, cts.Token)
+                .ConfigureAwait(false);
         }
     }
 }

@@ -12,26 +12,27 @@ public static class ExampleInfiniteProgram
     public static async Task Main()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
-            
-        var options = new DeadManSwitchOptions
-        {
-            Timeout = TimeSpan.FromSeconds(60)
-        };
+
+        var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(60) };
         // do not await this, it will never complete until you cancel the token
-        var run = InfiniteDeadManSwitchTask.RunAsync(async (deadManSwitch, cancellationToken) =>
-        {
-            deadManSwitch.Notify("Beginning work again");
+        var run = InfiniteDeadManSwitchTask.RunAsync(
+            async (deadManSwitch, cancellationToken) =>
+            {
+                deadManSwitch.Notify("Beginning work again");
 
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
 
-            deadManSwitch.Notify("Still busy, please don't cancel");
+                deadManSwitch.Notify("Still busy, please don't cancel");
 
-            await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
-
-        }, options, cancellationTokenSource.Token);
+                await DoSomethingUseful(cancellationToken).ConfigureAwait(false);
+            },
+            options,
+            cancellationTokenSource.Token
+        );
 
         // let it run for 10s.
-        await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token)
+            .ConfigureAwait(false);
 
         // now stop the infinite worker
         cancellationTokenSource.Cancel();

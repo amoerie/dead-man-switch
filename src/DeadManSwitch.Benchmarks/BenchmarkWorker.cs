@@ -9,7 +9,10 @@ namespace DeadManSwitch.Benchmarks
         // for diagnostic purposes
         public string Name => "Benchmark worker";
 
-        public Task<double> WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
+        public Task<double> WorkAsync(
+            IDeadManSwitch deadManSwitch,
+            CancellationToken cancellationToken
+        )
         {
             if (deadManSwitch == null)
                 throw new ArgumentNullException(nameof(deadManSwitch));

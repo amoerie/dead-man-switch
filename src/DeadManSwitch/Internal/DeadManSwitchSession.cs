@@ -14,11 +14,16 @@ namespace DeadManSwitch.Internal
         public DeadManSwitchSession(
             IDeadManSwitchContext deadManSwitchContext,
             IDeadManSwitch deadManSwitch,
-            IDeadManSwitchWatcher deadManSwitchWatcher)
+            IDeadManSwitchWatcher deadManSwitchWatcher
+        )
         {
-            DeadManSwitchContext = deadManSwitchContext ?? throw new ArgumentNullException(nameof(deadManSwitchContext));
+            DeadManSwitchContext =
+                deadManSwitchContext
+                ?? throw new ArgumentNullException(nameof(deadManSwitchContext));
             DeadManSwitch = deadManSwitch ?? throw new ArgumentNullException(nameof(deadManSwitch));
-            DeadManSwitchWatcher = deadManSwitchWatcher ?? throw new ArgumentNullException(nameof(deadManSwitchWatcher));
+            DeadManSwitchWatcher =
+                deadManSwitchWatcher
+                ?? throw new ArgumentNullException(nameof(deadManSwitchWatcher));
         }
 
         public IDeadManSwitchContext DeadManSwitchContext { get; }

@@ -17,17 +17,16 @@ namespace DeadManSwitch.Tests
                 // Arrange
                 double? pi = null;
                 var worker = WorkItems(
-                    Work(
-                        Do(_ => pi = Math.PI),
-                        Notify("Test")
-                    ),
-                    Work(
-                        Do(_ => cts.Cancel())
-                    )
+                    Work(Do(_ => pi = Math.PI), Notify("Test")),
+                    Work(Do(_ => cts.Cancel()))
                 );
 
                 // Act
-                await InfiniteDeadManSwitchTask.RunAsync(worker, DeadManSwitchOptions.Default, cts.Token);
+                await InfiniteDeadManSwitchTask.RunAsync(
+                    worker,
+                    DeadManSwitchOptions.Default,
+                    cts.Token
+                );
 
                 // Arrange
                 pi.Should().Be(Math.PI);

@@ -19,7 +19,11 @@ namespace DeadManSwitch
         /// <param name="cancellationToken">The cancellation token that is capable of immediately stopping the dead man's switch and the worker.</param>
         /// <returns>A task that will complete when the provided <paramref name="cancellationToken" /> is cancelled.</returns>
         /// <exception cref="Exception">When the worker throws an exception, this will not be caught</exception>
-        Task RunAsync(IInfiniteDeadManSwitchWorker worker, DeadManSwitchOptions options, CancellationToken cancellationToken);
+        Task RunAsync(
+            IInfiniteDeadManSwitchWorker worker,
+            DeadManSwitchOptions options,
+            CancellationToken cancellationToken
+        );
     }
 
     /// <inheritdoc />
@@ -33,38 +37,68 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="logger">The logger that will be used for diagnostic log messages</param>
         /// <param name="deadManSwitchSessionFactory">The session factory that is capable of starting a new dead man's switch session</param>
-        internal InfiniteDeadManSwitchRunner(IDeadManSwitchLogger<InfiniteDeadManSwitchRunner> logger,
-            IDeadManSwitchSessionFactory deadManSwitchSessionFactory)
+        internal InfiniteDeadManSwitchRunner(
+            IDeadManSwitchLogger<InfiniteDeadManSwitchRunner> logger,
+            IDeadManSwitchSessionFactory deadManSwitchSessionFactory
+        )
         {
-            _deadManSwitchSessionFactory = deadManSwitchSessionFactory ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
+            _deadManSwitchSessionFactory =
+                deadManSwitchSessionFactory
+                ?? throw new ArgumentNullException(nameof(deadManSwitchSessionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task RunAsync(IInfiniteDeadManSwitchWorker worker, DeadManSwitchOptions options, CancellationToken cancellationToken)
+        public async Task RunAsync(
+            IInfiniteDeadManSwitchWorker worker,
+            DeadManSwitchOptions options,
+            CancellationToken cancellationToken
+        )
         {
-            if (worker == null) throw new ArgumentNullException(nameof(worker));
+            if (worker == null)
+                throw new ArgumentNullException(nameof(worker));
 
-            _logger.Trace("Starting infinite worker loop for {WorkerName} using a dead man's switch", worker.Name);
+            _logger.Trace(
+                "Starting infinite worker loop for {WorkerName} using a dead man's switch",
+                worker.Name
+            );
 
             using (var deadManSwitchSession = _deadManSwitchSessionFactory.Create(options))
-            using (var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            using (
+                var watcherCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
+            )
             {
                 var watcherToken = watcherCTS.Token;
                 var deadManSwitch = deadManSwitchSession.DeadManSwitch;
                 var deadManSwitchWatcher = deadManSwitchSession.DeadManSwitchWatcher;
                 var deadManSwitchContext = deadManSwitchSession.DeadManSwitchContext;
-                var watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherToken), CancellationToken.None, TaskCreationOptions.LongRunning,
-                    TaskScheduler.Default);
+                var watcherTask = Task.Factory.StartNew(
+                    () => deadManSwitchWatcher.WatchAsync(watcherToken),
+                    CancellationToken.None,
+                    TaskCreationOptions.LongRunning,
+                    TaskScheduler.Default
+                );
                 var iteration = 1;
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    using (var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, deadManSwitchContext.CancellationToken))
+                    using (
+                        var workerCTS = CancellationTokenSource.CreateLinkedTokenSource(
+                            cancellationToken,
+                            deadManSwitchContext.CancellationToken
+                        )
+                    )
                     {
                         var workerToken = workerCTS.Token;
-                        _logger.Trace("Beginning work iteration {Iteration} of infinite worker {WorkerName} using a dead man's switch", iteration, worker.Name);
+                        _logger.Trace(
+                            "Beginning work iteration {Iteration} of infinite worker {WorkerName} using a dead man's switch",
+                            iteration,
+                            worker.Name
+                        );
 
-                        var workerTask = Task.Run(() => worker.WorkAsync(deadManSwitch, workerToken), CancellationToken.None);
+                        var workerTask = Task.Run(
+                            () => worker.WorkAsync(deadManSwitch, workerToken),
+                            CancellationToken.None
+                        );
 
                         try
                         {
@@ -83,15 +117,22 @@ namespace DeadManSwitch
 
                             deadManSwitch.Notify("Worker task was canceled");
 
-                            watcherTask = Task.Factory.StartNew(() => deadManSwitchWatcher.WatchAsync(watcherToken), CancellationToken.None, TaskCreationOptions.LongRunning,
-                                TaskScheduler.Default);
+                            watcherTask = Task.Factory.StartNew(
+                                () => deadManSwitchWatcher.WatchAsync(watcherToken),
+                                CancellationToken.None,
+                                TaskCreationOptions.LongRunning,
+                                TaskScheduler.Default
+                            );
                         }
                     }
 
                     iteration++;
                 }
 
-                _logger.Information("Cancellation requested, cleaning up infinite worker loop for {WorkerName}", worker.Name);
+                _logger.Information(
+                    "Cancellation requested, cleaning up infinite worker loop for {WorkerName}",
+                    worker.Name
+                );
 
                 watcherCTS.Cancel();
                 await watcherTask.ConfigureAwait(false);
@@ -116,8 +157,12 @@ namespace DeadManSwitch
         /// <returns>A new <see cref="IInfiniteDeadManSwitchRunner" /> that is capable of running <see cref="IInfiniteDeadManSwitchWorker" /></returns>
         public static IInfiniteDeadManSwitchRunner Create(IDeadManSwitchLoggerFactory loggerFactory)
         {
-            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
-            return new InfiniteDeadManSwitchRunner(loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(), new DeadManSwitchSessionFactory(loggerFactory));
+            if (loggerFactory == null)
+                throw new ArgumentNullException(nameof(loggerFactory));
+            return new InfiniteDeadManSwitchRunner(
+                loggerFactory.CreateLogger<InfiniteDeadManSwitchRunner>(),
+                new DeadManSwitchSessionFactory(loggerFactory)
+            );
         }
     }
 }
