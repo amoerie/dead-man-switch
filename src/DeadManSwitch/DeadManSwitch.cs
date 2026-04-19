@@ -29,7 +29,11 @@ namespace DeadManSwitch
         /// <summary>
         ///     Resumes the dead man's switch after pausing it.
         /// </summary>
-        [SuppressMessage("Naming", "CA1716", Justification = "Resume is the logical counterpart to Suspend")]
+        [SuppressMessage(
+            "Naming",
+            "CA1716",
+            Justification = "Resume is the logical counterpart to Suspend"
+        )]
         void Resume();
     }
 
@@ -45,7 +49,10 @@ namespace DeadManSwitch
         /// </summary>
         /// <param name="context"></param>
         /// <param name="logger"></param>
-        internal DeadManSwitch(IDeadManSwitchContext context, IDeadManSwitchLogger<DeadManSwitch> logger)
+        internal DeadManSwitch(
+            IDeadManSwitchContext context,
+            IDeadManSwitchLogger<DeadManSwitch> logger
+        )
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -54,9 +61,13 @@ namespace DeadManSwitch
         /// <inheritdoc />
         public void Notify(string notification)
         {
-            if (notification == null) throw new ArgumentNullException(nameof(notification));
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
 
-            _logger.Debug("The dead man's switch received a notification: {Notification}", notification);
+            _logger.Debug(
+                "The dead man's switch received a notification: {Notification}",
+                notification
+            );
 
             _context.AddNotification(new DeadManSwitchNotification(notification));
         }

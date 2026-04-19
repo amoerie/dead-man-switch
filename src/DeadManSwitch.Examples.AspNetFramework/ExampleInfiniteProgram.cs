@@ -13,28 +13,31 @@ namespace DeadManSwitch.Examples.AspNetFramework
         {
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var options = new DeadManSwitchOptions
-                {
-                    Timeout = TimeSpan.FromSeconds(60)
-                };
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(60) };
                 // do not await this, it will never complete until you cancel the token
-                var run = InfiniteDeadManSwitchTask.RunAsync(async (deadManSwitch, cancellationToken) =>
-                {
-                    deadManSwitch.Notify("Beginning work again");
+                var run = InfiniteDeadManSwitchTask.RunAsync(
+                    async (deadManSwitch, cancellationToken) =>
+                    {
+                        deadManSwitch.Notify("Beginning work again");
 
-                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken)
+                            .ConfigureAwait(false);
 
-                    deadManSwitch.Notify("Still busy, please don't cancel");
+                        deadManSwitch.Notify("Still busy, please don't cancel");
 
-                    // tell the dead man's switch to stop the clock
-                    deadManSwitch.Suspend();
+                        // tell the dead man's switch to stop the clock
+                        deadManSwitch.Suspend();
 
-                    // tell the dead man's switch to resume the clock
-                    deadManSwitch.Resume();
-                }, options, cancellationTokenSource.Token);
+                        // tell the dead man's switch to resume the clock
+                        deadManSwitch.Resume();
+                    },
+                    options,
+                    cancellationTokenSource.Token
+                );
 
                 // let it run for 10s.
-                await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token)
+                    .ConfigureAwait(false);
 
                 // now stop the infinite worker
                 cancellationTokenSource.Cancel();

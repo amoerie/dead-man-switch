@@ -15,13 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8.x
-            9.x
-            10.x
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Check formatting
+        run: dotnet csharpier check .
 
       - name: Restore
         run: dotnet restore ./src/DeadManSwitch.sln
@@ -32,4 +30,4 @@ jobs:
       - name: Test
         run: dotnet test ./src/DeadManSwitch.sln --no-restore --no-build --configuration Release --collect:"XPlat Code Coverage" --settings ./src/coverlet.runsettings
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v6

@@ -21,14 +21,24 @@ namespace DeadManSwitch.Tests
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
-                .WriteTo.TestOutput(testOutputHelper,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}")
+                .WriteTo.TestOutput(
+                    testOutputHelper,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:w5}] #{ThreadId,-3} {SourceContext} {Message}{NewLine}{Exception}"
+                )
                 .CreateLogger();
-            _loggerFactory = LoggerFactory.Create(builder => { builder.AddSerilog(logger); });
+            _loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.AddSerilog(logger);
+            });
             var loggerFactory = new TestLoggerFactory(_loggerFactory);
             _logger = _loggerFactory.CreateLogger<TestsForDeadManSwitchRunner>();
-            _sessionFactory = new CapturingDeadManSwitchSessionFactory(new DeadManSwitchSessionFactory(loggerFactory));
-            _runner = new DeadManSwitchRunner(loggerFactory.CreateLogger<DeadManSwitchRunner>(), _sessionFactory);
+            _sessionFactory = new CapturingDeadManSwitchSessionFactory(
+                new DeadManSwitchSessionFactory(loggerFactory)
+            );
+            _runner = new DeadManSwitchRunner(
+                loggerFactory.CreateLogger<DeadManSwitchRunner>(),
+                _sessionFactory
+            );
         }
 
         public void Dispose()
@@ -48,15 +58,22 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5), NumberOfNotificationsToKeep = 3};
+                var options = new DeadManSwitchOptions
+                {
+                    Timeout = TimeSpan.FromSeconds(5),
+                    NumberOfNotificationsToKeep = 3,
+                };
                 var worker = Worker(
                     Work(
                         async (deadManSwitch, cancellationToken) =>
                         {
-                            var sendNotifications = Enumerable.Range(0, numberOfNotifications)
+                            var sendNotifications = Enumerable
+                                .Range(0, numberOfNotifications)
                                 .AsParallel()
                                 .WithDegreeOfParallelism(100)
-                                .Select(i => Task.Run(() => deadManSwitch.Notify("Notification " + i)));
+                                .Select(i =>
+                                    Task.Run(() => deadManSwitch.Notify("Notification " + i))
+                                );
                             await Task.WhenAll(sendNotifications);
                         }
                     ),
@@ -81,7 +98,7 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
                     Work(
                         Pause(),
@@ -98,7 +115,10 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
+                await _runner
+                    .Invoking(m => m.RunAsync(worker, options, cts.Token))
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
 
                 // Assert
                 e.Should().BeNull();
@@ -111,7 +131,7 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(5) };
                 var worker = Worker(
                     Work(
                         (deadManSwitch, cancellationToken) =>
@@ -124,7 +144,10 @@ namespace DeadManSwitch.Tests
                 );
 
                 // Act
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
+                await _runner
+                    .Invoking(m => m.RunAsync(worker, options, cts.Token))
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -134,17 +157,17 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
-                    Work(
-                        Notify("Sleeping for 3 seconds"),
-                        Sleep(TimeSpan.FromSeconds(3))
-                    ),
+                    Work(Notify("Sleeping for 3 seconds"), Sleep(TimeSpan.FromSeconds(3))),
                     Result(Math.PI)
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
+                await _runner
+                    .Invoking(m => m.RunAsync(worker, options, cts.Token))
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -154,23 +177,21 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
-                    Work(
-                        Notify("Computing PI"),
-                        Sleep(TimeSpan.FromSeconds(3))),
+                    Work(Notify("Computing PI"), Sleep(TimeSpan.FromSeconds(3))),
                     Result(Math.PI)
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
+                await _runner
+                    .Invoking(m => m.RunAsync(worker, options, cts.Token))
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
 
                 // Arrange
                 worker = Worker(
-                    Work(
-                        Notify("Computing PI"),
-                        Sleep(TimeSpan.FromSeconds(1))
-                    ),
+                    Work(Notify("Computing PI"), Sleep(TimeSpan.FromSeconds(1))),
                     Result(Math.PI)
                 );
 
@@ -188,17 +209,17 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(3)),
-                        Notify("Computing PI")
-                    ),
+                    Work(Sleep(TimeSpan.FromSeconds(3)), Notify("Computing PI")),
                     Result(Math.PI)
                 );
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
+                await _runner
+                    .Invoking(m => m.RunAsync(worker, options, cts.Token))
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
 
                 // Arrange
                 worker = Worker(
@@ -228,16 +249,14 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(3))
-                    ),
-                    Result(Math.PI)
-                );
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
+                var worker = Worker(Work(Sleep(TimeSpan.FromSeconds(3))), Result(Math.PI));
 
                 // Act + Assert
-                await _runner.Invoking(m => m.RunAsync(worker, options, cts.Token)).Should().ThrowAsync<OperationCanceledException>();
+                await _runner
+                    .Invoking(m => m.RunAsync(worker, options, cts.Token))
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -247,13 +266,8 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(3))
-                    ),
-                    Result(Math.PI)
-                );
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
+                var worker = Worker(Work(Sleep(TimeSpan.FromSeconds(3))), Result(Math.PI));
 
                 // Act
                 var runTask = _runner.RunAsync(worker, options, cts.Token);
@@ -262,7 +276,10 @@ namespace DeadManSwitch.Tests
 
                 cts.Cancel();
 
-                await runTask.Invoking(async task => await task).Should().ThrowAsync<OperationCanceledException>();
+                await runTask
+                    .Invoking(async task => await task)
+                    .Should()
+                    .ThrowAsync<OperationCanceledException>();
             }
         }
 
@@ -272,14 +289,8 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    Work(
-                        Pause(),
-                        Sleep(TimeSpan.FromSeconds(3))
-                    ),
-                    Result(Math.PI)
-                );
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
+                var worker = Worker(Work(Pause(), Sleep(TimeSpan.FromSeconds(3))), Result(Math.PI));
 
                 // Act
                 var result = await _runner.RunAsync(worker, options, cts.Token);
@@ -295,7 +306,11 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5), NumberOfNotificationsToKeep = 10};
+                var options = new DeadManSwitchOptions
+                {
+                    Timeout = TimeSpan.FromSeconds(5),
+                    NumberOfNotificationsToKeep = 10,
+                };
                 var worker = Worker(
                     Work(
                         Notify("Notification 1"),
@@ -318,7 +333,7 @@ namespace DeadManSwitch.Tests
                     "Notification 1",
                     "Notification 2",
                     "Notification 3",
-                    "Notification 4"
+                    "Notification 4",
                 };
                 var actual = notifications.Select(n => n.Content).ToArray();
                 actual.Should().BeEquivalentTo(expected);
@@ -331,7 +346,11 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(5), NumberOfNotificationsToKeep = 3};
+                var options = new DeadManSwitchOptions
+                {
+                    Timeout = TimeSpan.FromSeconds(5),
+                    NumberOfNotificationsToKeep = 3,
+                };
                 var worker = Worker(
                     Work(
                         Notify("Notification 1"),
@@ -349,12 +368,7 @@ namespace DeadManSwitch.Tests
                 result.Should().Be(Math.PI);
                 _sessionFactory.Session.Should().NotBeNull();
                 var notifications = _sessionFactory.Session.DeadManSwitchContext.Notifications;
-                string[] expected =
-                {
-                    "Notification 2",
-                    "Notification 3",
-                    "Notification 4"
-                };
+                string[] expected = { "Notification 2", "Notification 3", "Notification 4" };
                 var actual = notifications.Select(n => n.Content).ToArray();
                 actual.Should().BeEquivalentTo(expected);
             }
@@ -368,7 +382,7 @@ namespace DeadManSwitch.Tests
                 // Arrange
                 var timeout = TimeSpan.FromSeconds(2);
                 var worker = Worker(Work(), Result(Math.PI));
-                var options = new DeadManSwitchOptions {Timeout = timeout};
+                var options = new DeadManSwitchOptions { Timeout = timeout };
 
                 // Act
                 var result = await _runner.RunAsync(worker, options, cts.Token);
@@ -384,13 +398,8 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    Work(
-                        Notify("Computing PI")
-                    ),
-                    Result(Math.PI)
-                );
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
+                var worker = Worker(Work(Notify("Computing PI")), Result(Math.PI));
 
                 // Act
                 var result = await _runner.RunAsync(worker, options, cts.Token);
@@ -406,7 +415,7 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
                     Work(
                         Notify("Sleeping for 1 second"),
@@ -434,12 +443,9 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
-                    Work(
-                        Notify("Sleeping for 1 second"),
-                        Sleep(TimeSpan.FromSeconds(1))
-                    ),
+                    Work(Notify("Sleeping for 1 second"), Sleep(TimeSpan.FromSeconds(1))),
                     Result(Math.PI)
                 );
 
@@ -457,13 +463,8 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    Work(
-                        Sleep(TimeSpan.FromSeconds(1))
-                    ),
-                    Result(Math.PI)
-                );
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
+                var worker = Worker(Work(Sleep(TimeSpan.FromSeconds(1))), Result(Math.PI));
 
                 // Act
                 var result = await _runner.RunAsync(worker, options, cts.Token);
@@ -480,7 +481,7 @@ namespace DeadManSwitch.Tests
             {
                 // Arrange
                 double? e = null;
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(4)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(4) };
                 var worker = Worker(
                     Work(
                         Pause(),
@@ -512,14 +513,8 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
-                var worker = Worker(
-                    Work(
-                        Pause(),
-                        Sleep(TimeSpan.FromSeconds(3))
-                    ),
-                    Result(Math.PI)
-                );
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
+                var worker = Worker(Work(Pause(), Sleep(TimeSpan.FromSeconds(3))), Result(Math.PI));
 
                 // Act
                 var result = await _runner.RunAsync(worker, options, cts.Token);
@@ -535,15 +530,9 @@ namespace DeadManSwitch.Tests
             using (var cts = new CancellationTokenSource())
             {
                 // Arrange
-                var options = new DeadManSwitchOptions {Timeout = TimeSpan.FromSeconds(2)};
+                var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(2) };
                 var worker = Worker(
-                    Work(
-                        Pause(),
-                        Sleep(TimeSpan.FromSeconds(3)),
-                        Pause(),
-                        Pause(),
-                        Resume()
-                    ),
+                    Work(Pause(), Sleep(TimeSpan.FromSeconds(3)), Pause(), Pause(), Resume()),
                     Result(Math.PI)
                 );
 

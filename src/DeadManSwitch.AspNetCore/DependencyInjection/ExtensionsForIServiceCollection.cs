@@ -14,9 +14,18 @@ namespace DeadManSwitch.AspNetCore.DependencyInjection
         /// </summary>
         public static IServiceCollection AddDeadManSwitch(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<IDeadManSwitchLoggerFactory, DeadManSwitchLoggerFactory>();
-            serviceCollection.AddSingleton(sp => DeadManSwitchRunner.Create(sp.GetRequiredService<IDeadManSwitchLoggerFactory>()));
-            serviceCollection.AddSingleton(sp => InfiniteDeadManSwitchRunner.Create(sp.GetRequiredService<IDeadManSwitchLoggerFactory>()));
+            serviceCollection.AddSingleton<
+                IDeadManSwitchLoggerFactory,
+                DeadManSwitchLoggerFactory
+            >();
+            serviceCollection.AddSingleton(sp =>
+                DeadManSwitchRunner.Create(sp.GetRequiredService<IDeadManSwitchLoggerFactory>())
+            );
+            serviceCollection.AddSingleton(sp =>
+                InfiniteDeadManSwitchRunner.Create(
+                    sp.GetRequiredService<IDeadManSwitchLoggerFactory>()
+                )
+            );
 
             return serviceCollection;
         }

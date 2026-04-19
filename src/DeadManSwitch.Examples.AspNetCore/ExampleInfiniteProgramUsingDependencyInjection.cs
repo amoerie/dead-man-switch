@@ -21,18 +21,16 @@ public static class ExampleInfiniteProgramUsingDependencyInjection
 
         var infiniteRunner = serviceProvider.GetRequiredService<IInfiniteDeadManSwitchRunner>();
         var worker = new ExampleInfiniteWorker();
-            
+
         using var cancellationTokenSource = new CancellationTokenSource();
-            
-        var options = new DeadManSwitchOptions
-        {
-            Timeout = TimeSpan.FromSeconds(60)
-        };
+
+        var options = new DeadManSwitchOptions { Timeout = TimeSpan.FromSeconds(60) };
         // do not await this, it will never complete until you cancel the token
         var run = infiniteRunner.RunAsync(worker, options, cancellationTokenSource.Token);
 
         // let it run for 10s.
-        await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token).ConfigureAwait(false);
+        await Task.Delay(TimeSpan.FromSeconds(10), cancellationTokenSource.Token)
+            .ConfigureAwait(false);
 
         // now stop the infinite worker
         cancellationTokenSource.Cancel();
@@ -41,7 +39,7 @@ public static class ExampleInfiniteProgramUsingDependencyInjection
         await run.ConfigureAwait(false);
     }
 }
-    
+
 public class ExampleInfiniteWorker : IInfiniteDeadManSwitchWorker
 {
     // for diagnostic purposes
@@ -49,7 +47,8 @@ public class ExampleInfiniteWorker : IInfiniteDeadManSwitchWorker
 
     public async Task WorkAsync(IDeadManSwitch deadManSwitch, CancellationToken cancellationToken)
     {
-        if (deadManSwitch is null) throw new ArgumentNullException(nameof(deadManSwitch));
+        if (deadManSwitch is null)
+            throw new ArgumentNullException(nameof(deadManSwitch));
 
         deadManSwitch.Notify("Beginning work again");
 
@@ -61,7 +60,10 @@ public class ExampleInfiniteWorker : IInfiniteDeadManSwitchWorker
 
         // tell the dead man's switch to stop the clock
         deadManSwitch.Suspend();
-        await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(cancellationToken).ConfigureAwait(false);
+        await DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(
+                cancellationToken
+            )
+            .ConfigureAwait(false);
 
         // tell the dead man's switch to resume the clock
         deadManSwitch.Resume();
@@ -72,7 +74,9 @@ public class ExampleInfiniteWorker : IInfiniteDeadManSwitchWorker
         await Task.Delay(100, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(CancellationToken cancellationToken)
+    private async Task DoSomethingThatCanTakeVeryLongButShouldNotBeCancelledByTheDeadManSwitch(
+        CancellationToken cancellationToken
+    )
     {
         await Task.Delay(100000, cancellationToken).ConfigureAwait(false);
     }
